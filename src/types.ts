@@ -62,6 +62,39 @@ export interface ImageConfigInput {
   presets?: Record<string, ImagePresetConfig>;
 }
 
+export interface ImageAttributes {
+  parentId: number | null;
+  name: string | null;
+  userId: number | null | undefined;
+  disk: string | null;
+  originalName: string | null;
+  path: string;
+  format: ImageFormat;
+  mimeType: string;
+  size: number;
+  width: number;
+  height: number;
+  hash: string;
+  alt: string | null;
+  visibility: 'public' | 'private';
+  metadata: Record<string, unknown> | null;
+}
+
+export interface ImageRecord extends ImageAttributes {
+  id: number;
+  userId: number | null;
+  thumbnails: ImageRecord[];
+  $preloaded: { thumbnails?: ImageRecord[] };
+  load(relation: 'thumbnails'): Promise<unknown>;
+  related(relation: 'thumbnails'): { query(): { delete(): Promise<unknown> } };
+  delete(): Promise<unknown>;
+}
+
+export interface ImageModel {
+  create(attributes: ImageAttributes): Promise<ImageRecord>;
+  createMany(attributes: ImageAttributes[]): Promise<unknown>;
+}
+
 export interface ProcessedImage {
   buffer: Buffer;
   format: ImageFormat;

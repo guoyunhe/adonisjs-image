@@ -2,9 +2,8 @@ import { createHash, randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 
 import { resolveImagePreset } from './define_config.js';
-import { Image } from './models/image.js';
 import { extensionOf, processOriginal, processThumbnail } from './processor.js';
-import type { ImageConfig, UploadOptions } from './types.js';
+import type { ImageConfig, ImageModel, ImageRecord, UploadOptions } from './types.js';
 
 /** Minimal subset of a Drive disk used by the service */
 export interface ImageDisk {
@@ -28,11 +27,12 @@ export class ImageService {
   constructor(
     readonly config: ImageConfig,
     private resolveDisk: DiskResolver,
+    private imageModel: ImageModel,
   ) {}
 
   use(preset = this.config.default) {
     resolveImagePreset(this.config, preset);
-    return new ImageService({ ...this.config, default: preset }, this.resolveDisk);
+    return new ImageService({ ...this.config, default: preset }, this.resolveDisk, this.imageModel);
   }
 
   private async toBuffer(input: UploadInput) {
@@ -86,7 +86,7 @@ export class ImageService {
       }
 
       const visibility = options.visibility ?? (await disk.getVisibility(path));
-      const image = await Image.create({
+      const image = await this.imageModel.create({
         parentId: null,
         name: null,
         userId: options.userId as number | null | undefined,
@@ -104,7 +104,7 @@ export class ImageService {
         metadata: options.metadata ?? null,
       });
       if (thumbs.length) {
-        await Image.createMany(
+        await this.imageModel.createMany(
           thumbs.map((t) => ({
             parentId: image.id,
             name: t.name,
@@ -133,7 +133,7 @@ export class ImageService {
   }
 
   /** Public URL, or a signed URL for private images */
-  async url(image: Image, thumbnail?: string) {
+  async url(image: ImageRecord, thumbnail?: string) {
     let path = image.path;
     if (thumbnail) {
       if (!image.$preloaded.thumbnails) await image.load('thumbnails');
@@ -147,7 +147,7 @@ export class ImageService {
   }
 
   /** Removes the files from Drive and the rows from the database */
-  async delete(image: Image) {
+  async delete(image: ImageRecord) {
     await image.load('thumbnails');
     const disk = this.resolveDisk(image.disk ?? undefined);
     await Promise.all(

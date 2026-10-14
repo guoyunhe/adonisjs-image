@@ -12,8 +12,7 @@
     ".": "./build/index.js",
     "./types": "./build/src/types.js",
     "./services/main": "./build/services/main.js",
-    "./image_provider": "./build/providers/image_provider.js",
-    "./models/image": "./build/src/models/image.js"
+    "./image_provider": "./build/providers/image_provider.js"
   },
   "scripts": {
     "build": "tsc",
