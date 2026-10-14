@@ -14,26 +14,22 @@ A complete AdonisJS image management package featuring seamless uploads, Drive s
 The generated `Image` model extends Lucid's generated `ImageSchema`. The `images` table stores
 original images and thumbnails:
 
-| Model property | Column       | Description                                                                                                                        |
-| -------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `id`           | `id`         | Auto-incrementing primary key.                                                                                                     |
-| `parentId`     | `parent_id`  | Nullable self-reference; null for an original, otherwise the original image's ID. Deleting an original cascades to its thumbnails. |
-| `name`         | `name`       | Nullable thumbnail name, such as `small`; null for an original.                                                                    |
-| `userId`       | `user_id`    | Nullable uploader ID referencing `users.id`; set to null if the user is deleted.                                                   |
-| `preset`       | `preset`     | Name of the preset used to process this row.                                                                                       |
-| `disk`         | `disk`       | Drive disk name used to store the file.                                                                                            |
-| `path`         | `path`       | File key/path on the Drive disk.                                                                                                   |
-| `format`       | `format`     | Output image format, such as `webp` or `jpeg`.                                                                                     |
-| `size`         | `size`       | Output file size in bytes.                                                                                                         |
-| `width`        | `width`      | Output width in pixels.                                                                                                            |
-| `height`       | `height`     | Output height in pixels.                                                                                                           |
-| `hash`         | `hash`       | SHA-256 hash of the stored image content.                                                                                          |
-| `createdAt`    | `created_at` | Row creation timestamp.                                                                                                            |
-| `updatedAt`    | `updated_at` | Row update timestamp.                                                                                                              |
-
-`parent_id` and `name` are unique together. The generated model exposes a `thumbnails` relation
-for the child rows. The configure command also adds `User.avatar`, a `belongsTo` relation using
-`users.avatar_id`.
+| Property    | Description                          |
+| ----------- | ------------------------------------ |
+| `id`        | Primary key.                         |
+| `parentId`  | Parent image ID; null for originals. |
+| `name`      | Thumbnail name; null for originals.  |
+| `userId`    | Uploader ID; null if deleted.        |
+| `preset`    | Processing preset.                   |
+| `disk`      | Drive disk.                          |
+| `path`      | Storage path.                        |
+| `format`    | Output format.                       |
+| `size`      | File size in bytes.                  |
+| `width`     | Width in pixels.                     |
+| `height`    | Height in pixels.                    |
+| `hash`      | SHA-256 hash.                        |
+| `createdAt` | Creation time.                       |
+| `updatedAt` | Update time.                         |
 
 ## Install
 
