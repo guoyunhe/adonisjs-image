@@ -23,6 +23,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "isomorphic-dompurify": "^2.26.0",
     "sharp": "^0.35.5"
   },
   "devDependencies": {

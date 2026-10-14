@@ -1,4 +1,5 @@
-export type ImageFormat = 'jpeg' | 'png' | 'webp' | 'avif' | 'gif' | 'tiff';
+export type RasterImageFormat = 'jpeg' | 'png' | 'webp' | 'avif' | 'gif' | 'tiff';
+export type ImageFormat = RasterImageFormat | 'svg';
 
 export type FitMode = 'cover' | 'contain' | 'fill' | 'inside' | 'outside';
 
@@ -6,8 +7,8 @@ export interface ThumbnailConfig {
   width?: number;
   height?: number;
   fit?: FitMode;
-  /** Output format. Defaults to the format of the processed original */
-  format?: ImageFormat;
+  /** Raster output format. Defaults to the format of the processed original, or PNG for SVG */
+  format?: RasterImageFormat;
   /** Compression quality 1-100. Defaults to the format quality setting */
   quality?: number;
 }
@@ -18,7 +19,7 @@ export interface ImageProcessingConfig {
   /** Accepted input formats */
   allowedFormats: ImageFormat[];
   /** Convert every upload to this format (e.g. 'webp') */
-  convertTo?: ImageFormat;
+  convertTo?: RasterImageFormat;
   /** Resize originals to fit within these dimensions */
   maxWidth?: number;
   maxHeight?: number;
@@ -27,7 +28,7 @@ export interface ImageProcessingConfig {
   /** Remove EXIF/metadata and auto-rotate by EXIF orientation */
   stripMetadata: boolean;
   /** Compression quality (1-100) per output format */
-  quality: Partial<Record<ImageFormat, number>>;
+  quality: Partial<Record<RasterImageFormat, number>>;
   /** Named thumbnails generated for every upload */
   thumbnails: Record<string, ThumbnailConfig>;
 }

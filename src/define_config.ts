@@ -3,7 +3,7 @@ import type { ImageConfig, ImageConfigInput, ResolvedImageConfig } from './types
 const defaultImagePreset: ResolvedImageConfig = {
   directory: 'images',
   maxFileSize: 10 * 1024 * 1024,
-  allowedFormats: ['jpeg', 'png', 'webp', 'avif', 'gif'],
+  allowedFormats: ['jpeg', 'png', 'webp', 'avif', 'gif', 'svg'],
   stripMetadata: true,
   quality: { jpeg: 80, webp: 80, avif: 50, png: 90, tiff: 80 },
   thumbnails: {},

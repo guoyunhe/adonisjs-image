@@ -5,6 +5,7 @@ A complete AdonisJS image management package featuring seamless uploads, Drive s
 ## Features
 
 - Fast, reliable image processing powered by [Sharp](https://sharp.pixelplumbing.com/).
+- Sanitized SVG originals with rasterized thumbnails.
 - Purpose-specific presets for avatars, general images, high-resolution photos, and more.
 - Automatic named thumbnails stored alongside their original images in one table.
 - [Drive](https://docs.adonisjs.com/guides/digging-deeper/drive)-compatible storage across local and cloud disks, with private-file URL signing.
@@ -71,27 +72,29 @@ their `quality` values are merged by format.
 | `disk`                  | Drive disk used to store files.                                                   | Drive's configured default disk                           |
 | `directory`             | Key prefix inside the disk.                                                       | `images`                                                  |
 | `maxFileSize`           | Maximum accepted input size, in bytes.                                            | `10 * 1024 * 1024`                                        |
-| `allowedFormats`        | Input formats accepted by the processor.                                          | `jpeg`, `png`, `webp`, `avif`, `gif`                      |
-| `convertTo`             | Output format for the original and default thumbnail format.                      | Input format                                              |
+| `allowedFormats`        | Input formats accepted by the processor.                                          | `jpeg`, `png`, `webp`, `avif`, `gif`, `svg`               |
+| `convertTo`             | Raster output format for the original and default thumbnail format.               | Input format                                              |
 | `maxWidth`, `maxHeight` | Maximum dimensions for the processed original. Images are never enlarged.         | No resize limit                                           |
 | `fit`                   | Resize mode for the original: `cover`, `contain`, `fill`, `inside`, or `outside`. | `inside`                                                  |
 | `stripMetadata`         | Strip metadata and auto-rotate from EXIF orientation.                             | `true`                                                    |
 | `quality`               | Compression quality from 1 to 100, keyed by format.                               | `jpeg: 80`, `webp: 80`, `avif: 50`, `png: 90`, `tiff: 80` |
 | `thumbnails`            | Map of thumbnail names to thumbnail settings.                                     | `{}`                                                      |
 
-`maxWidth`, `maxHeight`, and `fit` affect the original only when a resize limit is set. The
-generated starter config sets its own example limits; these defaults describe `defineConfig`.
+SVG originals are sanitized (scripts, event handlers, styles, and external resources are removed)
+and kept as vector files unless `convertTo` is set. Their thumbnails are rasterized as PNG by
+default. `maxWidth`, `maxHeight`, and `fit` affect raster originals only when a resize limit is set.
+The generated starter config sets its own example limits; these defaults describe `defineConfig`.
 
 ### Thumbnail properties
 
 Each entry in `thumbnails` is an object with these optional properties:
 
-| Property          | Description                                                      | Default                              |
-| ----------------- | ---------------------------------------------------------------- | ------------------------------------ |
-| `width`, `height` | Output dimensions in pixels.                                     | Unset                                |
-| `fit`             | Resize mode: `cover`, `contain`, `fill`, `inside`, or `outside`. | `cover`                              |
-| `format`          | Thumbnail output format.                                         | Processed original format            |
-| `quality`         | Compression quality from 1 to 100.                               | Preset quality for the output format |
+| Property          | Description                                                      | Default                                |
+| ----------------- | ---------------------------------------------------------------- | -------------------------------------- |
+| `width`, `height` | Output dimensions in pixels.                                     | Unset                                  |
+| `fit`             | Resize mode: `cover`, `contain`, `fill`, `inside`, or `outside`. | `cover`                                |
+| `format`          | Raster thumbnail output format.                                  | Processed original format; PNG for SVG |
+| `quality`         | Compression quality from 1 to 100.                               | Preset quality for the output format   |
 
 ## Routes and controller
 
