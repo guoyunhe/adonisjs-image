@@ -1,5 +1,5 @@
 {
-  "name": "@guoyunhe/adonisjs-image",
+  "name": "adonisjs-image",
   "version": "0.1.0",
   "description": "Image upload, processing and management for AdonisJS",
   "type": "module",

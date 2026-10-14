@@ -12,6 +12,6 @@ export async function configure(command: ConfigureCommand) {
     },
   })
   await codemods.updateRcFile((rcFile: { addProvider(p: string): unknown }) => {
-    rcFile.addProvider('@guoyunhe/adonisjs-image/image_provider')
+    rcFile.addProvider('adonisjs-image/image_provider')
   })
 }

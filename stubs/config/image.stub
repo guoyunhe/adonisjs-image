@@ -1,7 +1,7 @@
 {{{
   exports({ to: app.configPath('image.ts') })
 }}}
-import { defineConfig } from '@guoyunhe/adonisjs-image'
+import { defineConfig } from 'adonisjs-image'
 
 const imageConfig = defineConfig({
   /** Drive disk (defaults to the Drive default disk) */
