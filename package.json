@@ -1,0 +1,37 @@
+{
+  "name": "@guoyunhe/adonisjs-image",
+  "version": "0.1.0",
+  "description": "Image upload, processing and management for AdonisJS",
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    "build",
+    "stubs"
+  ],
+  "exports": {
+    ".": "./build/index.js",
+    "./types": "./build/src/types.js",
+    "./services/main": "./build/services/main.js",
+    "./image_provider": "./build/providers/image_provider.js",
+    "./models/image": "./build/src/models/image.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "tsx --test tests/*.spec.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@adonisjs/core": "^7.0.0",
+    "@adonisjs/drive": "^4.0.0",
+    "@adonisjs/lucid": "^22.0.0"
+  },
+  "dependencies": {
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.7.6",
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}
