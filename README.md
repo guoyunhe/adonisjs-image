@@ -26,9 +26,11 @@ node ace migration:run
 ```
 
 Requires `@adonisjs/drive` and `@adonisjs/lucid`. Edit `config/image.ts` to adjust settings.
-The generated migration references `users.id`; run the users table migration first.
-`node ace add` also creates `app/models/image.ts`. Running the image migration generates
-`database/schema.ts`; the app model extends its generated `ImageSchema` for column types.
+The generated image migration references `users.id`; the avatar migration adds `users.avatar_id`
+and references `images.id`. Run the existing users migration first, then the generated migrations
+in order. `node ace add` also creates `app/models/image.ts` and adds the `User.avatar` relationship
+to `app/models/user.ts`. Running the generated migrations creates `database/schema.ts`; the app
+model extends its generated `ImageSchema` for column types.
 
 ## Usage
 
