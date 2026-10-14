@@ -1,0 +1,32 @@
+{{{
+  exports({ to: app.configPath('image.ts') })
+}}}
+import { defineConfig } from '@guoyunhe/adonisjs-image'
+
+const imageConfig = defineConfig({
+  /** Drive disk (defaults to the Drive default disk) */
+  // disk: 'fs',
+  directory: 'images',
+  visibility: 'public',
+  maxFileSize: 10 * 1024 * 1024,
+
+  /** Accepted upload formats */
+  allowedFormats: ['jpeg', 'png', 'webp', 'avif', 'gif'],
+
+  /** Convert all uploads to one format */
+  // convertTo: 'webp',
+
+  /** Downscale (never enlarge) originals */
+  maxWidth: 2560,
+  maxHeight: 2560,
+  stripMetadata: true,
+  quality: { jpeg: 80, webp: 80, avif: 50, png: 90 },
+
+  /** Thumbnails generated for each upload */
+  thumbnails: {
+    small: { width: 150, height: 150, fit: 'cover', format: 'webp' },
+    medium: { width: 640, fit: 'inside', format: 'webp' },
+  },
+})
+
+export default imageConfig

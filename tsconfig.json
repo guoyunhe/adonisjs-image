@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "outDir": "build",
+    "rootDir": "."
+  },
+  "include": ["index.ts", "configure.ts", "src", "providers", "services"],
+  "exclude": ["build", "node_modules"]
+}
