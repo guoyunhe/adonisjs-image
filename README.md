@@ -19,7 +19,10 @@ A complete AdonisJS image management package featuring seamless uploads, Drive s
   - [Preset properties](#preset-properties)
   - [Thumbnail properties](#thumbnail-properties)
 - [Routes and controller](#routes-and-controller)
-- [Optional user avatar](#optional-user-avatar)
+- [User avatar](#user-avatar)
+  - [Avatar Migration](#avatar-migration)
+  - [Avatar Relationship](#avatar-relationship)
+  - [Avatar Routes](#avatar-routes)
 
 ## Install
 
@@ -189,10 +192,18 @@ regenerated later if preset settings change.
 
 Invalid uploads throw `InvalidImageException`.
 
-## Optional user avatar
+## User avatar
+
+### Avatar Migration
 
 To associate users with avatar images, add an `avatar_id` column after the `images` table has been
-created. Create a migration such as:
+created. Generate a migration:
+
+```sh
+node ace make:migration add_avatar_to_users
+```
+
+Then add:
 
 ```ts
 // database/migrations/<timestamp>_add_avatar_to_users.ts
@@ -224,6 +235,8 @@ export default class AddAvatarToUsers extends BaseSchema {
 }
 ```
 
+### Avatar Relationship
+
 Then add this relation to your `User` model:
 
 ```ts
@@ -236,3 +249,8 @@ import { Image } from '#models/image';
 @belongsTo(() => Image)
 declare avatar: BelongsTo<typeof Image>;
 ```
+
+### Avatar Routes
+
+Use the image endpoints described in [Routes and controller](#routes-and-controller) for uploading
+and serving images. In the upload action, select the `avatar` preset with `image.use('avatar')`.
