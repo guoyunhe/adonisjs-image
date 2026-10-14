@@ -1,15 +1,46 @@
-import type { ImageConfig } from './types.js';
+import type {
+  ImageConfig,
+  ImageConfigInput,
+  ImagePresetConfig,
+  ResolvedImageConfig,
+} from './types.js';
 
-export function defineConfig(config: Partial<ImageConfig> = {}): ImageConfig {
+const defaultImagePreset: ResolvedImageConfig = {
+  directory: 'images',
+  maxFileSize: 10 * 1024 * 1024,
+  allowedFormats: ['jpeg', 'png', 'webp', 'avif', 'gif'],
+  stripMetadata: true,
+  quality: { jpeg: 80, webp: 80, avif: 50, png: 90, tiff: 80 },
+  thumbnails: {},
+  tableName: 'images',
+};
+
+export function defineConfig(config: ImageConfigInput = {}): ImageConfig {
+  const presets = config.presets ?? {};
+  const imagePreset = presets.image ?? {};
+  const image: ResolvedImageConfig = {
+    ...defaultImagePreset,
+    ...imagePreset,
+    quality: { ...defaultImagePreset.quality, ...imagePreset.quality },
+  };
+
   return {
-    directory: 'images',
-    visibility: 'public',
-    maxFileSize: 10 * 1024 * 1024,
-    allowedFormats: ['jpeg', 'png', 'webp', 'avif', 'gif'],
-    stripMetadata: true,
-    quality: { jpeg: 80, webp: 80, avif: 50, png: 90, tiff: 80 },
-    thumbnails: {},
-    tableName: 'images',
-    ...config,
+    default: config.default ?? 'image',
+    presets: { ...presets, image },
+  };
+}
+
+export function resolveImagePreset(
+  config: ImageConfig,
+  name = config.default,
+): ResolvedImageConfig {
+  const preset = config.presets[name];
+  if (!preset) throw new Error(`Image preset "${name}" is not configured`);
+  const image = config.presets.image;
+
+  return {
+    ...image,
+    ...preset,
+    quality: { ...image.quality, ...preset.quality },
   };
 }

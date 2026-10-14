@@ -1,6 +1,11 @@
 import sharp, { type Sharp } from 'sharp';
 
-import type { ImageConfig, ImageFormat, ProcessedImage, ThumbnailConfig } from './types.js';
+import type {
+  ImageFormat,
+  ImageProcessingConfig,
+  ProcessedImage,
+  ThumbnailConfig,
+} from './types.js';
 
 const MIME: Record<ImageFormat, string> = {
   jpeg: 'image/jpeg',
@@ -53,7 +58,7 @@ async function encode(
  * Validates the input against the config and returns the processed original (converted, resized,
  * compressed).
  */
-export async function processOriginal(input: Buffer, config: ImageConfig) {
+export async function processOriginal(input: Buffer, config: ImageProcessingConfig) {
   if (input.length > config.maxFileSize) {
     throw new InvalidImageException(`Image exceeds the max size of ${config.maxFileSize} bytes`);
   }
@@ -76,7 +81,7 @@ export async function processOriginal(input: Buffer, config: ImageConfig) {
     pipeline = pipeline.resize({
       width: config.maxWidth,
       height: config.maxHeight,
-      fit: 'inside',
+      fit: config.fit ?? 'inside',
       withoutEnlargement: true,
     });
   }
@@ -86,7 +91,7 @@ export async function processOriginal(input: Buffer, config: ImageConfig) {
 export async function processThumbnail(
   input: Buffer,
   thumb: ThumbnailConfig,
-  config: ImageConfig,
+  config: ImageProcessingConfig,
   fallbackFormat: ImageFormat,
 ) {
   const format = thumb.format ?? fallbackFormat;

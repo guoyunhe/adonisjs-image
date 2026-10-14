@@ -1,8 +1,8 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 
+import { resolveImagePreset } from './define_config.js';
 import { Image } from './models/image.js';
-import { ImageThumbnail } from './models/image_thumbnail.js';
 import { extensionOf, processOriginal, processThumbnail } from './processor.js';
 import type { ImageConfig, UploadOptions } from './types.js';
 
@@ -11,10 +11,11 @@ export interface ImageDisk {
   put(
     key: string,
     contents: Uint8Array,
-    options?: { visibility?: string; contentType?: string },
+    options?: { visibility?: 'public' | 'private'; contentType?: string },
   ): Promise<void>;
   delete(key: string): Promise<void>;
   getUrl(key: string): Promise<string>;
+  getVisibility(key: string): Promise<'public' | 'private'>;
   getSignedUrl?(key: string, options?: Record<string, unknown>): Promise<string>;
 }
 
@@ -29,8 +30,9 @@ export class ImageService {
     private resolveDisk: DiskResolver,
   ) {}
 
-  private disk() {
-    return this.resolveDisk(this.config.disk);
+  use(preset = this.config.default) {
+    resolveImagePreset(this.config, preset);
+    return new ImageService({ ...this.config, default: preset }, this.resolveDisk);
   }
 
   private async toBuffer(input: UploadInput) {
@@ -45,17 +47,21 @@ export class ImageService {
    * and records everything in the database.
    */
   async upload(input: UploadInput, options: UploadOptions = {}) {
+    const config = resolveImagePreset(this.config, options.preset);
     const raw = await this.toBuffer(input);
-    const original = await processOriginal(raw, this.config);
-    const visibility = options.visibility ?? this.config.visibility;
-    const disk = this.disk();
+    const original = await processOriginal(raw, config);
+    const disk = this.resolveDisk(config.disk);
 
     const id = randomUUID();
     const day = new Date().toISOString().slice(0, 7).replace('-', '/');
-    const base = `${this.config.directory}/${day}/${id}`;
+    const base = `${config.directory}/${day}/${id}`;
     const written: string[] = [];
     const put = async (key: string, data: Buffer, contentType: string) => {
-      await disk.put(key, data, { visibility, contentType });
+      await disk.put(
+        key,
+        data,
+        options.visibility ? { visibility: options.visibility, contentType } : { contentType },
+      );
       written.push(key);
     };
 
@@ -72,16 +78,19 @@ export class ImageService {
         path: string;
         result: Awaited<ReturnType<typeof processThumbnail>>;
       }[] = [];
-      for (const [name, thumb] of Object.entries(this.config.thumbnails)) {
-        const result = await processThumbnail(raw, thumb, this.config, original.format);
+      for (const [name, thumb] of Object.entries(config.thumbnails)) {
+        const result = await processThumbnail(raw, thumb, config, original.format);
         const thumbPath = `${base}_${name}.${extensionOf(result.format)}`;
         await put(thumbPath, result.buffer, result.mimeType);
         thumbs.push({ name, path: thumbPath, result });
       }
 
+      const visibility = options.visibility ?? (await disk.getVisibility(path));
       const image = await Image.create({
+        parentId: null,
+        name: null,
         userId: options.userId as number | null | undefined,
-        disk: this.config.disk ?? null,
+        disk: config.disk ?? null,
         originalName: originalName ?? null,
         path,
         format: original.format,
@@ -95,16 +104,23 @@ export class ImageService {
         metadata: options.metadata ?? null,
       });
       if (thumbs.length) {
-        await ImageThumbnail.createMany(
+        await Image.createMany(
           thumbs.map((t) => ({
-            imageId: image.id,
+            parentId: image.id,
             name: t.name,
+            userId: image.userId,
+            disk: image.disk,
+            originalName: null,
             path: t.path,
             format: t.result.format,
             mimeType: t.result.mimeType,
             size: t.result.size,
             width: t.result.width,
             height: t.result.height,
+            hash: createHash('sha256').update(t.result.buffer).digest('hex'),
+            alt: null,
+            visibility,
+            metadata: null,
           })),
         );
       }

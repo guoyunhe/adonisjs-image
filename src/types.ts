@@ -12,30 +12,54 @@ export interface ThumbnailConfig {
   quality?: number;
 }
 
-export interface ImageConfig {
-  /** Drive disk used for storage. Defaults to the Drive default disk */
-  disk?: string;
-  /** Directory (key prefix) inside the disk */
-  directory: string;
-  /** File visibility passed to Drive */
-  visibility: 'public' | 'private';
+export interface ImageProcessingConfig {
   /** Max upload size in bytes */
   maxFileSize: number;
   /** Accepted input formats */
   allowedFormats: ImageFormat[];
   /** Convert every upload to this format (e.g. 'webp') */
   convertTo?: ImageFormat;
-  /** Downscale originals larger than this (never enlarges) */
+  /** Resize originals to fit within these dimensions */
   maxWidth?: number;
   maxHeight?: number;
+  /** Resize mode for the original. Defaults to 'inside' */
+  fit?: FitMode;
   /** Remove EXIF/metadata and auto-rotate by EXIF orientation */
   stripMetadata: boolean;
   /** Compression quality (1-100) per output format */
   quality: Partial<Record<ImageFormat, number>>;
   /** Named thumbnails generated for every upload */
   thumbnails: Record<string, ThumbnailConfig>;
-  /** Name of the images table (thumbnails use `<table>_thumbnails`) */
+}
+
+export interface ImagePresetConfig extends Partial<ImageProcessingConfig> {
+  /** Drive disk used for storage. Defaults to the Drive default disk */
+  disk?: string;
+  /** Directory (key prefix) inside the disk */
+  directory?: string;
+  /** Name of the images table */
+  tableName?: string;
+}
+
+export interface ResolvedImageConfig extends ImageProcessingConfig {
+  /** Drive disk used for storage. Defaults to the Drive default disk */
+  disk?: string;
+  /** Directory (key prefix) inside the disk */
+  directory: string;
+  /** Name of the images table */
   tableName: string;
+}
+
+export interface ImageConfig {
+  /** Preset used when upload options do not specify one */
+  default: string;
+  /** Named image configurations. Other presets inherit unspecified options from `image` */
+  presets: Record<string, ImagePresetConfig> & { image: ResolvedImageConfig };
+}
+
+export interface ImageConfigInput {
+  default?: string;
+  presets?: Record<string, ImagePresetConfig>;
 }
 
 export interface ProcessedImage {
@@ -54,4 +78,6 @@ export interface UploadOptions {
   alt?: string | null;
   visibility?: 'public' | 'private';
   metadata?: Record<string, unknown>;
+  /** Image preset to use. Defaults to the configured default */
+  preset?: string;
 }

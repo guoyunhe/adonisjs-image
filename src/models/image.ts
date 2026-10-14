@@ -2,13 +2,17 @@ import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm';
 import type { HasMany } from '@adonisjs/lucid/types/relations';
 import type { DateTime } from 'luxon';
 
-import { ImageThumbnail } from './image_thumbnail.js';
-
 export class Image extends BaseModel {
   static table = 'images';
 
   @column({ isPrimary: true })
   declare id: number;
+
+  @column()
+  declare parentId: number | null;
+
+  @column()
+  declare name: string | null;
 
   @column()
   declare userId: number | null;
@@ -52,8 +56,8 @@ export class Image extends BaseModel {
   })
   declare metadata: Record<string, unknown> | null;
 
-  @hasMany(() => ImageThumbnail)
-  declare thumbnails: HasMany<typeof ImageThumbnail>;
+  @hasMany(() => Image, { foreignKey: 'parentId' })
+  declare thumbnails: HasMany<typeof Image>;
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime;

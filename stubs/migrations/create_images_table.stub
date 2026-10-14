@@ -7,12 +7,20 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
   protected tableName = 'images'
-  protected thumbnailsTable = 'images_thumbnails'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.integer('user_id').unsigned().nullable().index()
+      table.integer('parent_id').unsigned().nullable().references('id').inTable(this.tableName).onDelete('CASCADE')
+      table.string('name').nullable()
+      table
+        .integer('user_id')
+        .unsigned()
+        .nullable()
+        .references('id')
+        .inTable('users')
+        .onDelete('SET NULL')
+      table.index('user_id')
       table.string('disk').nullable()
       table.string('original_name').nullable()
       table.string('path').notNullable()
@@ -25,27 +33,13 @@ export default class extends BaseSchema {
       table.string('alt').nullable()
       table.string('visibility', 16).notNullable().defaultTo('public')
       table.text('metadata').nullable()
+      table.unique(['parent_id', 'name'])
       table.timestamp('created_at')
       table.timestamp('updated_at')
-    })
-
-    this.schema.createTable(this.thumbnailsTable, (table) => {
-      table.increments('id')
-      table.integer('image_id').unsigned().notNullable().references('id').inTable(this.tableName).onDelete('CASCADE')
-      table.string('name').notNullable()
-      table.string('path').notNullable()
-      table.string('format', 16).notNullable()
-      table.string('mime_type', 64).notNullable()
-      table.bigInteger('size').unsigned().notNullable()
-      table.integer('width').unsigned().notNullable()
-      table.integer('height').unsigned().notNullable()
-      table.timestamp('created_at')
-      table.unique(['image_id', 'name'])
     })
   }
 
   async down() {
-    this.schema.dropTable(this.thumbnailsTable)
     this.schema.dropTable(this.tableName)
   }
 }
