@@ -4,18 +4,10 @@ A complete AdonisJS image management package featuring seamless uploads, Drive s
 
 ## Features
 
-- Drive integration (any `@adonisjs/drive` disk)
-- Configurable allowed formats, format conversion, resizing and compression (powered by `sharp`)
-- Named thumbnails with their own size/format/quality
-- A single `images` table for originals and their named thumbnails
-- `ImageService`: `upload`, `url` (signed for private images), `delete`
-
-Thumbnail records are child rows in `images`, linked to the original by `parent_id` and identified
-by `name`. Each row stores the actual Drive disk name used, including the configured default, so
-changing the default disk later does not redirect existing images. To query originals only, filter
-for a null `parentId`.
-File visibility follows the selected Drive disk's configuration; `upload` can still override it
-for an individual file. URL generation checks the file's current visibility directly from Drive.
+- Fast, reliable image processing powered by [Sharp](https://sharp.pixelplumbing.com/).
+- Purpose-specific presets for avatars, general images, high-resolution photos, and more.
+- Automatic named thumbnails stored alongside their original images in one table.
+- [Drive](https://docs.adonisjs.com/guides/drive)-compatible storage across local and cloud disks, with private-file URL signing.
 
 ## Image model and table
 
