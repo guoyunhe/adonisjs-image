@@ -18,21 +18,27 @@ export interface ImageDisk {
   getSignedUrl?(key: string, options?: Record<string, unknown>): Promise<string>;
 }
 
-export type DiskResolver = (name?: string) => ImageDisk;
+export type DiskResolver = (name: string) => ImageDisk;
 
 /** A multipart file (has `tmpPath`), a Buffer or a filesystem path */
-export type UploadInput = Buffer | { tmpPath?: string; clientName?: string } | string;
+export type UploadInput = Buffer | { tmpPath?: string } | string;
 
 export class ImageService {
   constructor(
     readonly config: ImageConfig,
     private resolveDisk: DiskResolver,
     private imageModel: ImageModel,
+    private defaultDisk: string,
   ) {}
 
   use(preset = this.config.default) {
     resolveImagePreset(this.config, preset);
-    return new ImageService({ ...this.config, default: preset }, this.resolveDisk, this.imageModel);
+    return new ImageService(
+      { ...this.config, default: preset },
+      this.resolveDisk,
+      this.imageModel,
+      this.defaultDisk,
+    );
   }
 
   private async toBuffer(input: UploadInput) {
@@ -47,10 +53,12 @@ export class ImageService {
    * and records everything in the database.
    */
   async upload(input: UploadInput, options: UploadOptions = {}) {
-    const config = resolveImagePreset(this.config, options.preset);
+    const preset = options.preset ?? this.config.default;
+    const config = resolveImagePreset(this.config, preset);
     const raw = await this.toBuffer(input);
     const original = await processOriginal(raw, config);
-    const disk = this.resolveDisk(config.disk);
+    const diskName = config.disk ?? this.defaultDisk;
+    const disk = this.resolveDisk(diskName);
 
     const id = randomUUID();
     const day = new Date().toISOString().slice(0, 7).replace('-', '/');
@@ -64,10 +72,6 @@ export class ImageService {
       );
       written.push(key);
     };
-
-    const originalName =
-      options.originalName ??
-      (typeof input === 'object' && !Buffer.isBuffer(input) ? input.clientName : undefined);
 
     try {
       const path = `${base}.${original.extension}`;
@@ -85,13 +89,12 @@ export class ImageService {
         thumbs.push({ name, path: thumbPath, result });
       }
 
-      const visibility = options.visibility ?? (await disk.getVisibility(path));
       const image = await this.imageModel.create({
         parentId: null,
         name: null,
         userId: options.userId as number | null | undefined,
-        disk: config.disk ?? null,
-        originalName: originalName ?? null,
+        disk: diskName,
+        preset,
         path,
         format: original.format,
         mimeType: original.mimeType,
@@ -100,8 +103,6 @@ export class ImageService {
         height: original.height,
         hash: createHash('sha256').update(original.buffer).digest('hex'),
         alt: options.alt ?? null,
-        visibility,
-        metadata: options.metadata ?? null,
       });
       if (thumbs.length) {
         await this.imageModel.createMany(
@@ -110,7 +111,7 @@ export class ImageService {
             name: t.name,
             userId: image.userId,
             disk: image.disk,
-            originalName: null,
+            preset,
             path: t.path,
             format: t.result.format,
             mimeType: t.result.mimeType,
@@ -119,8 +120,6 @@ export class ImageService {
             height: t.result.height,
             hash: createHash('sha256').update(t.result.buffer).digest('hex'),
             alt: null,
-            visibility,
-            metadata: null,
           })),
         );
       }
@@ -141,15 +140,18 @@ export class ImageService {
       if (!thumb) throw new Error(`Thumbnail "${thumbnail}" does not exist`);
       path = thumb.path;
     }
-    const disk = this.resolveDisk(image.disk ?? undefined);
-    if (image.visibility === 'private' && disk.getSignedUrl) return disk.getSignedUrl(path);
+
+    const disk = this.resolveDisk(image.disk);
+    if ((await disk.getVisibility(path)) === 'private' && disk.getSignedUrl) {
+      return disk.getSignedUrl(path);
+    }
     return disk.getUrl(path);
   }
 
   /** Removes the files from Drive and the rows from the database */
   async delete(image: ImageRecord) {
     await image.load('thumbnails');
-    const disk = this.resolveDisk(image.disk ?? undefined);
+    const disk = this.resolveDisk(image.disk);
     await Promise.all(
       [image.path, ...image.thumbnails.map((t) => t.path)].map((k) => disk.delete(k)),
     );

@@ -1,24 +1,11 @@
 {{{
   exports({ to: app.makePath('app/models/image.ts') })
 }}}
-import { column, hasMany } from '@adonisjs/lucid/orm'
+import { hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { ImageSchema } from '#database/schema'
-import type { ImageFormat } from 'adonisjs-image/types'
 
 export class Image extends ImageSchema {
-  static table = 'images'
-
-  declare format: ImageFormat
-
-  declare visibility: 'public' | 'private'
-
   @hasMany(() => Image, { foreignKey: 'parentId' })
   declare thumbnails: HasMany<typeof Image>
-
-  @column({
-    prepare: (value) => (value ? JSON.stringify(value) : null),
-    consume: (value) => (typeof value === 'string' ? JSON.parse(value) : value),
-  })
-  declare metadata: Record<string, unknown> | null
 }

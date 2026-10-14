@@ -12,6 +12,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.integer('parent_id').unsigned().nullable().references('id').inTable(this.tableName).onDelete('CASCADE')
+      table.index('parent_id')
       table.string('name').nullable()
       table
         .integer('user_id')
@@ -21,8 +22,8 @@ export default class extends BaseSchema {
         .inTable('users')
         .onDelete('SET NULL')
       table.index('user_id')
-      table.string('disk').nullable()
-      table.string('original_name').nullable()
+      table.string('disk').notNullable()
+      table.string('preset').notNullable()
       table.string('path').notNullable()
       table.string('format', 16).notNullable()
       table.string('mime_type', 64).notNullable()
@@ -31,8 +32,6 @@ export default class extends BaseSchema {
       table.integer('height').unsigned().notNullable()
       table.string('hash', 64).notNullable().index()
       table.string('alt').nullable()
-      table.string('visibility', 16).notNullable().defaultTo('public')
-      table.json('metadata').nullable()
       table.unique(['parent_id', 'name'])
       table.timestamp('created_at')
       table.timestamp('updated_at')

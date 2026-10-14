@@ -11,9 +11,11 @@ A complete AdonisJS image management package featuring seamless uploads, Drive s
 - `ImageService`: `upload`, `url` (signed for private images), `delete`
 
 Thumbnail records are child rows in `images`, linked to the original by `parent_id` and identified
-by `name`. To query originals only, filter for a null `parentId`.
+by `name`. Each row stores the actual Drive disk name used, including the configured default, so
+changing the default disk later does not redirect existing images. To query originals only, filter
+for a null `parentId`.
 File visibility follows the selected Drive disk's configuration; `upload` can still override it
-for an individual file.
+for an individual file. URL generation checks the file's current visibility directly from Drive.
 
 ## Install
 
@@ -39,11 +41,14 @@ const avatarImages = image.use('avatar');
 const avatar = await avatarImages.upload(file!, { userId: auth.user!.id });
 const photoImages = image.use('photo');
 const photo = await photoImages.upload(file!, { userId: auth.user!.id });
-const url = await image.url(img, 'small');
+const url = await image.url(img);
+const thumbnailUrl = await image.url(img, 'small');
 await image.delete(img);
 ```
 
 The `image` preset is used by default. Configure named presets in `config/image.ts` to apply
 different size, crop, format, quality, and thumbnail settings for avatars, photos, or other uses.
+Each uploaded image and its thumbnails record the preset name used, so generated files can be
+regenerated later if preset settings change.
 
 Invalid uploads throw `InvalidImageException`.

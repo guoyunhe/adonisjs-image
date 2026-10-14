@@ -66,8 +66,8 @@ export interface ImageAttributes {
   parentId: number | null;
   name: string | null;
   userId: number | null | undefined;
-  disk: string | null;
-  originalName: string | null;
+  disk: string;
+  preset: string;
   path: string;
   format: ImageFormat;
   mimeType: string;
@@ -76,8 +76,6 @@ export interface ImageAttributes {
   height: number;
   hash: string;
   alt: string | null;
-  visibility: 'public' | 'private';
-  metadata: Record<string, unknown> | null;
 }
 
 export interface ImageRecord extends ImageAttributes {
@@ -107,10 +105,8 @@ export interface ProcessedImage {
 
 export interface UploadOptions {
   userId?: number | string | null;
-  originalName?: string;
   alt?: string | null;
   visibility?: 'public' | 'private';
-  metadata?: Record<string, unknown>;
   /** Image preset to use. Defaults to the configured default */
   preset?: string;
 }
