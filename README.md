@@ -9,9 +9,20 @@ A complete AdonisJS image management package featuring seamless uploads, Drive s
 - Automatic named thumbnails stored alongside their original images in one table.
 - [Drive](https://docs.adonisjs.com/guides/digging-deeper/drive)-compatible storage across local and cloud disks, with private-file URL signing.
 
+## Table of contents
+
+- [Features](#features)
+- [Install](#install)
+- [Image model and table](#image-model-and-table)
+- [Configuration](#configuration)
+  - [Preset properties](#preset-properties)
+  - [Thumbnail properties](#thumbnail-properties)
+- [Routes and controller](#routes-and-controller)
+- [Optional user avatar](#optional-user-avatar)
+
 ## Install
 
-Requires [@adonisjs/auth](https://docs.adonisjs.com/guides/auth/introduction), [@adonisjs/drive](https://docs.adonisjs.com/guides/digging-deeper/drive) and [@adonisjs/lucid](https://docs.adonisjs.com/guides/database/lucid).
+Requires [@adonisjs/drive](https://docs.adonisjs.com/guides/digging-deeper/drive), [@adonisjs/lucid](https://docs.adonisjs.com/guides/database/lucid), and an existing `users` table.
 
 ```sh
 pnpm add adonisjs-image
@@ -19,10 +30,10 @@ node ace add adonisjs-image
 node ace migration:run
 ```
 
-The generated migrations require the existing `users` table. `node ace add` creates the image
-config/model, adds `User.avatar`, and generates the image migrations. It does not create routes or
-a controller; see the examples below. After migration, Lucid generates `database/schema.ts`, which
-provides the `ImageSchema` extended by the generated model.
+The image migration references `users.id`, so create the `users` table first. `node ace add`
+generates the image config, model, and migration. It does not modify your `User` model or create
+routes/controller; see the optional avatar and route examples below. After migration, Lucid
+generates `database/schema.ts`, which provides the `ImageSchema` extended by the generated model.
 
 ## Image model and table
 
@@ -88,6 +99,7 @@ The configure command does not modify `start/routes.ts` or generate a controller
 resource route and create `app/controllers/images_controller.ts` using the following examples:
 
 ```ts
+// start/routes.ts
 import router from '@adonisjs/core/services/router';
 
 import { controllers } from '#generated/controllers';
@@ -104,6 +116,7 @@ router.resource('images', controllers.Images).only(['store', 'show', 'destroy'])
 Add the authentication and authorization middleware appropriate for your application.
 
 ```ts
+// app/controllers/images_controller.ts
 import type { HttpContext } from '@adonisjs/core/http';
 import image from 'adonisjs-image/services/main';
 
@@ -172,3 +185,51 @@ Each uploaded image and its thumbnails record the preset name used, so generated
 regenerated later if preset settings change.
 
 Invalid uploads throw `InvalidImageException`.
+
+## Optional user avatar
+
+To associate users with avatar images, add an `avatar_id` column after the `images` table has been
+created. Create a migration such as:
+
+```ts
+// database/migrations/<timestamp>_add_avatar_to_users.ts
+import { BaseSchema } from '@adonisjs/lucid/schema';
+
+export default class AddAvatarToUsers extends BaseSchema {
+  protected tableName = 'users';
+
+  async up() {
+    this.schema.alterTable(this.tableName, (table) => {
+      table
+        .integer('avatar_id')
+        .unsigned()
+        .nullable()
+        .references('id')
+        .inTable('images')
+        .onDelete('SET NULL');
+      table.index('avatar_id');
+    });
+  }
+
+  async down() {
+    this.schema.alterTable(this.tableName, (table) => {
+      table.dropForeign(['avatar_id']);
+      table.dropIndex(['avatar_id']);
+      table.dropColumn('avatar_id');
+    });
+  }
+}
+```
+
+Then add this relation to your `User` model:
+
+```ts
+// app/models/user.ts
+import { belongsTo } from '@adonisjs/lucid/orm';
+import type { BelongsTo } from '@adonisjs/lucid/types/relations';
+import { Image } from '#models/image';
+
+// Inside User
+@belongsTo(() => Image)
+declare avatar: BelongsTo<typeof Image>;
+```
