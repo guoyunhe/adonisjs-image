@@ -31,7 +31,6 @@ export default class extends BaseSchema {
       table.integer('width').unsigned().notNullable()
       table.integer('height').unsigned().notNullable()
       table.string('hash', 64).notNullable().index()
-      table.string('alt').nullable()
       table.unique(['parent_id', 'name'])
       table.timestamp('created_at')
       table.timestamp('updated_at')

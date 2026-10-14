@@ -102,7 +102,6 @@ export class ImageService {
         width: original.width,
         height: original.height,
         hash: createHash('sha256').update(original.buffer).digest('hex'),
-        alt: options.alt ?? null,
       });
       if (thumbs.length) {
         await this.imageModel.createMany(
@@ -119,7 +118,6 @@ export class ImageService {
             width: t.result.width,
             height: t.result.height,
             hash: createHash('sha256').update(t.result.buffer).digest('hex'),
-            alt: null,
           })),
         );
       }

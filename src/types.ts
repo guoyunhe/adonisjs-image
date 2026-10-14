@@ -75,7 +75,6 @@ export interface ImageAttributes {
   width: number;
   height: number;
   hash: string;
-  alt: string | null;
 }
 
 export interface ImageRecord extends ImageAttributes {
@@ -105,7 +104,6 @@ export interface ProcessedImage {
 
 export interface UploadOptions {
   userId?: number | string | null;
-  alt?: string | null;
   visibility?: 'public' | 'private';
   /** Image preset to use. Defaults to the configured default */
   preset?: string;
