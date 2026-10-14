@@ -95,11 +95,77 @@ Each entry in `thumbnails` is an object with these optional properties:
 | `format`          | Thumbnail output format.                                         | Processed original format            |
 | `quality`         | Compression quality from 1 to 100.                               | Preset quality for the output format |
 
-## Usage
+## Routes and controller
+
+The configure command does not modify `start/routes.ts` or generate a controller. Add the
+resource route and create `app/controllers/images_controller.ts` using the following examples:
 
 ```ts
+import router from '@adonisjs/core/services/router';
+
+import { controllers } from '#generated/controllers';
+
+router.resource('images', controllers.Images).only(['store', 'show', 'destroy']);
+```
+
+| Method   | Path          | Purpose                                                                   |
+| -------- | ------------- | ------------------------------------------------------------------------- |
+| `POST`   | `/images`     | Upload the multipart file in the `image` field.                           |
+| `GET`    | `/images/:id` | Get the original image URL; add `?thumbnail=small` for a named thumbnail. |
+| `DELETE` | `/images/:id` | Delete an image and its thumbnails.                                       |
+
+Add the authentication and authorization middleware appropriate for your application.
+
+```ts
+import type { HttpContext } from '@adonisjs/core/http';
 import image from 'adonisjs-image/services/main';
 
+import { Image } from '#models/image';
+
+export default class ImagesController {
+  async store({ request, response }: HttpContext) {
+    const file = request.file('image');
+    if (!file?.tmpPath) {
+      return response.badRequest({ message: 'An image file is required' });
+    }
+
+    const uploaded = await image.upload(file.tmpPath);
+    const thumbnails: { name: string; url: string }[] = [];
+    for (const thumbnail of uploaded.thumbnails) {
+      if (!thumbnail.name) continue;
+      thumbnails.push({
+        name: thumbnail.name,
+        url: await image.url(uploaded, thumbnail.name),
+      });
+    }
+
+    return response.created({
+      id: uploaded.id,
+      url: await image.url(uploaded),
+      thumbnails,
+    });
+  }
+
+  async show({ params, request }: HttpContext) {
+    const record = await Image.findOrFail(params.id);
+    const thumbnail = request.input('thumbnail');
+    return {
+      id: record.id,
+      url: await image.url(record, typeof thumbnail === 'string' ? thumbnail : undefined),
+    };
+  }
+
+  async destroy({ params, response }: HttpContext) {
+    const record = await Image.findOrFail(params.id);
+    await image.delete(record);
+    return response.noContent();
+  }
+}
+```
+
+The service can also be used directly from application code:
+
+```ts
 const file = request.file('image', { extnames: ['jpg', 'png', 'webp'] });
 const img = await image.upload(file!, { userId: auth.user!.id });
 const avatarImages = image.use('avatar');
