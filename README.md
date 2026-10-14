@@ -59,6 +59,42 @@ in order. `node ace add` also creates `app/models/image.ts` and adds the `User.a
 to `app/models/user.ts`. Running the generated migrations creates `database/schema.ts`; the app
 model extends its generated `ImageSchema` for column types.
 
+## Configuration
+
+Configure `config/image.ts` with `defineConfig`. The top-level `default` selects the preset used
+when an upload does not specify one; it defaults to `image`. All image processing options live
+inside `presets.image`. Additional named presets inherit unspecified options from `image`, while
+their `quality` values are merged by format.
+
+### Preset properties
+
+| Property                | Description                                                                       | Default                                                   |
+| ----------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `disk`                  | Drive disk used to store files.                                                   | Drive's configured default disk                           |
+| `directory`             | Key prefix inside the disk.                                                       | `images`                                                  |
+| `maxFileSize`           | Maximum accepted input size, in bytes.                                            | `10 * 1024 * 1024`                                        |
+| `allowedFormats`        | Input formats accepted by the processor.                                          | `jpeg`, `png`, `webp`, `avif`, `gif`                      |
+| `convertTo`             | Output format for the original and default thumbnail format.                      | Input format                                              |
+| `maxWidth`, `maxHeight` | Maximum dimensions for the processed original. Images are never enlarged.         | No resize limit                                           |
+| `fit`                   | Resize mode for the original: `cover`, `contain`, `fill`, `inside`, or `outside`. | `inside`                                                  |
+| `stripMetadata`         | Strip metadata and auto-rotate from EXIF orientation.                             | `true`                                                    |
+| `quality`               | Compression quality from 1 to 100, keyed by format.                               | `jpeg: 80`, `webp: 80`, `avif: 50`, `png: 90`, `tiff: 80` |
+| `thumbnails`            | Map of thumbnail names to thumbnail settings.                                     | `{}`                                                      |
+
+`maxWidth`, `maxHeight`, and `fit` affect the original only when a resize limit is set. The
+generated starter config sets its own example limits; these defaults describe `defineConfig`.
+
+### Thumbnail properties
+
+Each entry in `thumbnails` is an object with these optional properties:
+
+| Property          | Description                                                      | Default                              |
+| ----------------- | ---------------------------------------------------------------- | ------------------------------------ |
+| `width`, `height` | Output dimensions in pixels.                                     | Unset                                |
+| `fit`             | Resize mode: `cover`, `contain`, `fill`, `inside`, or `outside`. | `cover`                              |
+| `format`          | Thumbnail output format.                                         | Processed original format            |
+| `quality`         | Compression quality from 1 to 100.                               | Preset quality for the output format |
+
 ## Usage
 
 ```ts
