@@ -1,4 +1,4 @@
-import type { ImageConfig } from './types.js'
+import type { ImageConfig } from './types.js';
 
 export function defineConfig(config: Partial<ImageConfig> = {}): ImageConfig {
   return {
@@ -11,5 +11,5 @@ export function defineConfig(config: Partial<ImageConfig> = {}): ImageConfig {
     thumbnails: {},
     tableName: 'images',
     ...config,
-  }
+  };
 }

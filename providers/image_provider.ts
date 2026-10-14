@@ -1,10 +1,11 @@
-import type { ApplicationService } from '@adonisjs/core/types'
-import { ImageService } from '../src/image_service.js'
-import type { ImageConfig } from '../src/types.js'
+import type { ApplicationService } from '@adonisjs/core/types';
+
+import { ImageService } from '../src/image_service.js';
+import type { ImageConfig } from '../src/types.js';
 
 declare module '@adonisjs/core/types' {
   interface ContainerBindings {
-    'image.manager': ImageService
+    'image.manager': ImageService;
   }
 }
 
@@ -13,9 +14,9 @@ export default class ImageProvider {
 
   register() {
     this.app.container.singleton('image.manager', async (resolver) => {
-      const config = this.app.config.get<ImageConfig>('image')
-      const drive = (await resolver.make('drive.manager' as never)) as any
-      return new ImageService(config, (name) => drive.use(name))
-    })
+      const config = this.app.config.get<ImageConfig>('image');
+      const drive = (await resolver.make('drive.manager' as never)) as any;
+      return new ImageService(config, (name) => drive.use(name));
+    });
   }
 }

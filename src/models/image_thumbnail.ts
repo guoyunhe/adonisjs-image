@@ -1,36 +1,36 @@
-import { BaseModel, column } from '@adonisjs/lucid/orm'
-import type { DateTime } from 'luxon'
+import { BaseModel, column } from '@adonisjs/lucid/orm';
+import type { DateTime } from 'luxon';
 
 export class ImageThumbnail extends BaseModel {
-  static table = 'images_thumbnails'
+  static table = 'images_thumbnails';
 
   @column({ isPrimary: true })
-  declare id: number
+  declare id: number;
 
   @column()
-  declare imageId: number
+  declare imageId: number;
 
   @column()
-  declare name: string
+  declare name: string;
 
   @column()
-  declare path: string
+  declare path: string;
 
   @column()
-  declare format: string
+  declare format: string;
 
   @column()
-  declare mimeType: string
+  declare mimeType: string;
 
   @column()
-  declare size: number
+  declare size: number;
 
   @column()
-  declare width: number
+  declare width: number;
 
   @column()
-  declare height: number
+  declare height: number;
 
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare createdAt: DateTime;
 }

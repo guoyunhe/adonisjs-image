@@ -2,12 +2,12 @@
   "name": "adonisjs-image",
   "version": "0.1.0",
   "description": "Image upload, processing and management for AdonisJS",
-  "type": "module",
   "license": "MIT",
   "files": [
     "build",
     "stubs"
   ],
+  "type": "module",
   "exports": {
     ".": "./build/index.js",
     "./types": "./build/src/types.js",
@@ -17,21 +17,37 @@
   },
   "scripts": {
     "build": "tsc",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "prepare": "husky",
     "test": "tsx --test tests/*.spec.ts",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@guoyunhe/oxfmt-config": "^1.1.0",
+    "@types/luxon": "^3.7.6",
+    "@types/node": "^26.6.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "oxfmt": "^0.73.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   },
   "peerDependencies": {
     "@adonisjs/core": "^7.0.0",
     "@adonisjs/drive": "^4.0.0",
     "@adonisjs/lucid": "^22.0.0"
   },
-  "dependencies": {
-    "sharp": "^0.35.5"
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,mts,cts,jsx,tsx,vue,json,jsonc,css,scss,less,htm,html,md,mdx,yaml,yml}": "oxfmt --write"
   },
-  "devDependencies": {
-    "@types/luxon": "^3.7.6",
-    "@types/node": "^26.6.5",
-    "tsx": "^4.23.15",
-    "typescript": "^7.0.2"
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": ">=12.11.2"
+    }
   }
 }
