@@ -26,7 +26,6 @@ export default class extends BaseSchema {
       table.string('disk').notNullable()
       table.string('path').notNullable()
       table.string('format', 16).notNullable()
-      table.string('mime_type', 64).notNullable()
       table.bigInteger('size').unsigned().notNullable()
       table.integer('width').unsigned().notNullable()
       table.integer('height').unsigned().notNullable()

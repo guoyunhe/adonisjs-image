@@ -66,7 +66,6 @@ export interface ImageAttributes {
   preset: string;
   path: string;
   format: ImageFormat;
-  mimeType: string;
   size: number;
   width: number;
   height: number;
@@ -91,7 +90,6 @@ export interface ImageModel {
 export interface ProcessedImage {
   buffer: Buffer;
   format: ImageFormat;
-  mimeType: string;
   extension: string;
   width: number;
   height: number;

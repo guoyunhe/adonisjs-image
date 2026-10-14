@@ -32,7 +32,6 @@ original images and thumbnails:
 | `disk`         | `disk`       | Drive disk name used to store the file.                                                                                            |
 | `path`         | `path`       | File key/path on the Drive disk.                                                                                                   |
 | `format`       | `format`     | Output image format, such as `webp` or `jpeg`.                                                                                     |
-| `mimeType`     | `mime_type`  | Output MIME type.                                                                                                                  |
 | `size`         | `size`       | Output file size in bytes.                                                                                                         |
 | `width`        | `width`      | Output width in pixels.                                                                                                            |
 | `height`       | `height`     | Output height in pixels.                                                                                                           |

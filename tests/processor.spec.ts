@@ -15,7 +15,6 @@ test('converts and resizes originals', async () => {
   const config = defineConfig({ presets: { image: { convertTo: 'webp', maxWidth: 100 } } });
   const out = await processOriginal(await png(), resolveImagePreset(config));
   assert.equal(out.format, 'webp');
-  assert.equal(out.mimeType, 'image/webp');
   assert.equal(out.width, 100);
   assert.equal(out.height, 50);
   assert.equal(out.size, out.buffer.length);

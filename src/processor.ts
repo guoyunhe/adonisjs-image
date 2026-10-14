@@ -7,14 +7,7 @@ import type {
   ThumbnailConfig,
 } from './types.js';
 
-const MIME: Record<ImageFormat, string> = {
-  jpeg: 'image/jpeg',
-  png: 'image/png',
-  webp: 'image/webp',
-  avif: 'image/avif',
-  gif: 'image/gif',
-  tiff: 'image/tiff',
-};
+const FORMATS = new Set<string>(['jpeg', 'png', 'webp', 'avif', 'gif', 'tiff']);
 
 export class InvalidImageException extends Error {
   static code = 'E_INVALID_IMAGE';
@@ -24,11 +17,7 @@ function normalizeFormat(format: string | undefined): ImageFormat | undefined {
   if (format === 'jpg') return 'jpeg';
   if (format === 'tif') return 'tiff';
   if (format === 'heif') return 'avif';
-  return format && format in MIME ? (format as ImageFormat) : undefined;
-}
-
-export function mimeTypeOf(format: ImageFormat) {
-  return MIME[format];
+  return format && FORMATS.has(format) ? (format as ImageFormat) : undefined;
 }
 
 export function extensionOf(format: ImageFormat) {
@@ -46,7 +35,6 @@ async function encode(
   return {
     buffer: data,
     format,
-    mimeType: MIME[format],
     extension: extensionOf(format),
     width: info.width,
     height: info.height,

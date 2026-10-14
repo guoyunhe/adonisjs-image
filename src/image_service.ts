@@ -10,7 +10,7 @@ export interface ImageDisk {
   put(
     key: string,
     contents: Uint8Array,
-    options?: { visibility?: 'public' | 'private'; contentType?: string },
+    options?: { visibility?: 'public' | 'private' },
   ): Promise<void>;
   delete(key: string): Promise<void>;
   getUrl(key: string): Promise<string>;
@@ -64,18 +64,18 @@ export class ImageService {
     const day = new Date().toISOString().slice(0, 7).replace('-', '/');
     const base = `${config.directory}/${day}/${id}`;
     const written: string[] = [];
-    const put = async (key: string, data: Buffer, contentType: string) => {
+    const put = async (key: string, data: Buffer) => {
       await disk.put(
         key,
         data,
-        options.visibility ? { visibility: options.visibility, contentType } : { contentType },
+        options.visibility ? { visibility: options.visibility } : undefined,
       );
       written.push(key);
     };
 
     try {
       const path = `${base}.${original.extension}`;
-      await put(path, original.buffer, original.mimeType);
+      await put(path, original.buffer);
 
       const thumbs: {
         name: string;
@@ -85,7 +85,7 @@ export class ImageService {
       for (const [name, thumb] of Object.entries(config.thumbnails)) {
         const result = await processThumbnail(raw, thumb, config, original.format);
         const thumbPath = `${base}_${name}.${extensionOf(result.format)}`;
-        await put(thumbPath, result.buffer, result.mimeType);
+        await put(thumbPath, result.buffer);
         thumbs.push({ name, path: thumbPath, result });
       }
 
@@ -97,7 +97,6 @@ export class ImageService {
         preset,
         path,
         format: original.format,
-        mimeType: original.mimeType,
         size: original.size,
         width: original.width,
         height: original.height,
@@ -113,7 +112,6 @@ export class ImageService {
             preset,
             path: t.path,
             format: t.result.format,
-            mimeType: t.result.mimeType,
             size: t.result.size,
             width: t.result.width,
             height: t.result.height,
