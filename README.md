@@ -254,5 +254,55 @@ export default class User extends compose(UserSchema, withAuthFinder(hash)) {
 
 ### Avatar Routes
 
-Use the image endpoints described in [Routes and controller](#routes-and-controller) for uploading
-and serving images. In the upload action, select the `avatar` preset with `image.use('avatar')`.
+Add an endpoint to replace the authenticated user's avatar:
+
+```ts
+// start/routes.ts
+import router from '@adonisjs/core/services/router';
+
+import { controllers } from '#generated/controllers';
+import { middleware } from '#start/kernel';
+
+router
+  .group(() => {
+    router.put('/avatar', [controllers.Avatar, 'update']);
+    router.delete('/avatar', [controllers.Avatar, 'destroy']);
+  })
+  .prefix('/profile')
+  .use(middleware.auth());
+```
+
+Protect this route with your application's authentication middleware.
+
+```ts
+// app/controllers/avatar_controller.ts
+import type { HttpContext } from '@adonisjs/core/http';
+import image from 'adonisjs-image/services/main';
+
+export default class AvatarController {
+  async update({ auth, request, response }: HttpContext) {
+    const user = auth.user!;
+    const file = request.file('avatar');
+    if (!file?.tmpPath) {
+      return response.badRequest({ message: 'An avatar image is required' });
+    }
+
+    const uploaded = await image.use('avatar').upload(file.tmpPath, { userId: user.id });
+    await user.related('avatar').associate(uploaded);
+
+    return response.ok({
+      id: uploaded.id,
+      url: await image.url(uploaded),
+    });
+  }
+
+  async destroy({ auth, response }: HttpContext) {
+    const user = auth.user!;
+    await user.load('avatar');
+    if (!user.avatar) return response.noContent();
+
+    await image.delete(user.avatar);
+    return response.noContent();
+  }
+}
+```
