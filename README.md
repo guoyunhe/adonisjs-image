@@ -7,11 +7,11 @@ A complete AdonisJS image management package featuring seamless uploads, Drive s
 - Fast, reliable image processing powered by [Sharp](https://sharp.pixelplumbing.com/).
 - Purpose-specific presets for avatars, general images, high-resolution photos, and more.
 - Automatic named thumbnails stored alongside their original images in one table.
-- [Drive](https://docs.adonisjs.com/guides/drive)-compatible storage across local and cloud disks, with private-file URL signing.
+- [Drive](https://docs.adonisjs.com/guides/digging-deeper/drive)-compatible storage across local and cloud disks, with private-file URL signing.
 
 ## Install
 
-Requires `@adonisjs/drive` and `@adonisjs/lucid`. Configure Drive before adding this package.
+Requires [@adonisjs/auth](https://docs.adonisjs.com/guides/auth/introduction), [@adonisjs/drive](https://docs.adonisjs.com/guides/digging-deeper/drive) and [@adonisjs/lucid](https://docs.adonisjs.com/guides/database/lucid).
 
 ```sh
 pnpm add adonisjs-image
