@@ -73,6 +73,13 @@ async function addUserAvatarRelation(
 }
 
 export async function configure(command: ConfigureCommand) {
+  if (!command.app.config.get('drive')) {
+    command.logger.warning(
+      'The Drive package is not configured. Configure @adonisjs/drive before setting up adonisjs-image.',
+    );
+    return;
+  }
+
   const codemods = await command.createCodemods();
   await addUserAvatarRelation(command, codemods);
   await codemods.makeUsingStub(stubsRoot, 'config/image.stub', {});
