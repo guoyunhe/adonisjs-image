@@ -37,8 +37,6 @@ export interface ImagePresetConfig extends Partial<ImageProcessingConfig> {
   disk?: string;
   /** Directory (key prefix) inside the disk */
   directory?: string;
-  /** Name of the images table */
-  tableName?: string;
 }
 
 export interface ResolvedImageConfig extends ImageProcessingConfig {
@@ -46,8 +44,6 @@ export interface ResolvedImageConfig extends ImageProcessingConfig {
   disk?: string;
   /** Directory (key prefix) inside the disk */
   directory: string;
-  /** Name of the images table */
-  tableName: string;
 }
 
 export interface ImageConfig {

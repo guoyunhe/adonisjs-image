@@ -1,9 +1,4 @@
-import type {
-  ImageConfig,
-  ImageConfigInput,
-  ImagePresetConfig,
-  ResolvedImageConfig,
-} from './types.js';
+import type { ImageConfig, ImageConfigInput, ResolvedImageConfig } from './types.js';
 
 const defaultImagePreset: ResolvedImageConfig = {
   directory: 'images',
@@ -12,7 +7,6 @@ const defaultImagePreset: ResolvedImageConfig = {
   stripMetadata: true,
   quality: { jpeg: 80, webp: 80, avif: 50, png: 90, tiff: 80 },
   thumbnails: {},
-  tableName: 'images',
 };
 
 export function defineConfig(config: ImageConfigInput = {}): ImageConfig {
