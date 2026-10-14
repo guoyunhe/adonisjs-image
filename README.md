@@ -126,7 +126,7 @@ Add the authentication and authorization middleware appropriate for your applica
 import type { HttpContext } from '@adonisjs/core/http';
 import image from 'adonisjs-image/services/main';
 
-import { Image } from '#models/image';
+import Image from '#models/image';
 
 export default class ImagesController {
   async store({ request, response }: HttpContext) {
@@ -243,11 +243,13 @@ Then add this relation to your `User` model:
 // app/models/user.ts
 import { belongsTo } from '@adonisjs/lucid/orm';
 import type { BelongsTo } from '@adonisjs/lucid/types/relations';
-import { Image } from '#models/image';
 
-// Inside User
-@belongsTo(() => Image)
-declare avatar: BelongsTo<typeof Image>;
+import Image from '#models/image';
+
+export default class User extends compose(UserSchema, withAuthFinder(hash)) {
+  @belongsTo(() => Image)
+  declare avatar: BelongsTo<typeof Image>;
+}
 ```
 
 ### Avatar Routes

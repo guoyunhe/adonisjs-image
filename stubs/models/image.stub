@@ -5,7 +5,7 @@ import { hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
 import { ImageSchema } from '#database/schema'
 
-export class Image extends ImageSchema {
+export default class Image extends ImageSchema {
   @hasMany(() => Image, { foreignKey: 'parentId' })
   declare thumbnails: HasMany<typeof Image>
 }
