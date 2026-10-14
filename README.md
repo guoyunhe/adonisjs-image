@@ -9,6 +9,21 @@ A complete AdonisJS image management package featuring seamless uploads, Drive s
 - Automatic named thumbnails stored alongside their original images in one table.
 - [Drive](https://docs.adonisjs.com/guides/drive)-compatible storage across local and cloud disks, with private-file URL signing.
 
+## Install
+
+Requires `@adonisjs/drive` and `@adonisjs/lucid`. Configure Drive before adding this package.
+
+```sh
+pnpm add adonisjs-image
+node ace add adonisjs-image
+node ace migration:run
+```
+
+The generated migrations require the existing `users` table. `node ace add` creates the image
+config/model, adds `User.avatar`, and generates the image migrations. It does not create routes or
+a controller; see the examples below. After migration, Lucid generates `database/schema.ts`, which
+provides the `ImageSchema` extended by the generated model.
+
 ## Image model and table
 
 The generated `Image` model extends Lucid's generated `ImageSchema`. The `images` table stores
@@ -31,24 +46,9 @@ original images and thumbnails:
 | `createdAt` | Creation time.                       |
 | `updatedAt` | Update time.                         |
 
-## Install
-
-```sh
-npm install --save adonisjs-image
-node ace add adonisjs-image   # or: node ace configure adonisjs-image
-node ace migration:run
-```
-
-Requires `@adonisjs/drive` and `@adonisjs/lucid`. Edit `config/image.ts` to adjust settings.
-The generated image migration references `users.id`; the avatar migration adds `users.avatar_id`
-and references `images.id`. Run the existing users migration first, then the generated migrations
-in order. `node ace add` also creates `app/models/image.ts` and adds the `User.avatar` relationship
-to `app/models/user.ts`. Running the generated migrations creates `database/schema.ts`; the app
-model extends its generated `ImageSchema` for column types.
-
 ## Configuration
 
-Configure `config/image.ts` with `defineConfig`. The top-level `default` selects the preset used
+Edit `config/image.ts` to adjust settings. The top-level `default` selects the preset used
 when an upload does not specify one; it defaults to `image`. All image processing options live
 inside `presets.image`. Additional named presets inherit unspecified options from `image`, while
 their `quality` values are merged by format.
@@ -153,6 +153,8 @@ export default class ImagesController {
 The service can also be used directly from application code:
 
 ```ts
+import image from 'adonisjs-image/services/main';
+
 const file = request.file('image', { extnames: ['jpg', 'png', 'webp'] });
 const img = await image.upload(file!, { userId: auth.user!.id });
 const avatarImages = image.use('avatar');
