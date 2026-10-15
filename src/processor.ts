@@ -94,26 +94,19 @@ async function encode(
   };
 }
 
-/**
- * Validates the input against the config and returns the processed original (converted, resized,
- * compressed).
- */
+/** Validates the image data and returns the processed original (converted, resized, compressed). */
 export async function processOriginal(
   input: Buffer,
   config: ImageProcessingConfig,
 ): Promise<ProcessedImage> {
-  if (input.length > config.maxFileSize) {
-    throw new InvalidImageException(`Image exceeds the max size of ${config.maxFileSize} bytes`);
-  }
-
   let sourceFormat: ImageFormat | undefined;
   try {
     sourceFormat = normalizeFormat((await sharp(input).metadata()).format);
   } catch {
     throw new InvalidImageException('File is not a valid image');
   }
-  if (!sourceFormat || !config.allowedFormats.includes(sourceFormat)) {
-    throw new InvalidImageException(`Image format "${sourceFormat ?? 'unknown'}" is not allowed`);
+  if (!sourceFormat) {
+    throw new InvalidImageException('Image format is not supported');
   }
 
   const cleanInput = sourceFormat === 'svg' ? sanitizeSvg(input, config.stripMetadata) : input;

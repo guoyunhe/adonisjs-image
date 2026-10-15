@@ -10,10 +10,6 @@ const imageConfig = defineConfig({
       /** Drive disk (defaults to the Drive default disk) */
       // disk: 'fs',
       directory: 'images',
-      maxFileSize: 10 * 1024 * 1024,
-
-      /** Accepted upload formats */
-      allowedFormats: ['jpeg', 'png', 'webp', 'avif', 'gif', 'svg'],
 
       /** Convert all uploads to one format */
       // convertTo: 'webp',

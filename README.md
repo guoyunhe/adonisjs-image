@@ -19,6 +19,7 @@ A complete AdonisJS image management package featuring seamless uploads, Drive s
   - [Preset properties](#preset-properties)
   - [Thumbnail properties](#thumbnail-properties)
 - [Routes and controller](#routes-and-controller)
+  - [Validate uploads with Vine](#validate-uploads-with-vine)
 - [User avatar](#user-avatar)
   - [Avatar Migration](#avatar-migration)
   - [Avatar Relationship](#avatar-relationship)
@@ -74,8 +75,6 @@ their `quality` values are merged by format.
 | ----------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------- |
 | `disk`                  | Drive disk used to store files.                                                   | Drive's configured default disk                           |
 | `directory`             | Key prefix inside the disk.                                                       | `images`                                                  |
-| `maxFileSize`           | Maximum accepted input size, in bytes.                                            | `10 * 1024 * 1024`                                        |
-| `allowedFormats`        | Input formats accepted by the processor.                                          | `jpeg`, `png`, `webp`, `avif`, `gif`, `svg`               |
 | `convertTo`             | Raster output format for the original and default thumbnail format.               | Input format                                              |
 | `maxWidth`, `maxHeight` | Maximum dimensions for the processed original. Images are never enlarged.         | No resize limit                                           |
 | `fit`                   | Resize mode for the original: `cover`, `contain`, `fill`, `inside`, or `outside`. | `inside`                                                  |
@@ -127,12 +126,13 @@ import type { HttpContext } from '@adonisjs/core/http';
 import image from 'adonisjs-image/services/main';
 
 import Image from '#models/image';
+import { uploadImageValidator } from '#validators/image';
 
 export default class ImagesController {
   async store({ request, response }: HttpContext) {
-    const file = request.file('image');
-    if (!file?.tmpPath) {
-      return response.badRequest({ message: 'An image file is required' });
+    const { image: file } = await request.validateUsing(uploadImageValidator);
+    if (!file.tmpPath) {
+      return response.badRequest({ message: 'Could not read uploaded image' });
     }
 
     const uploaded = await image.upload(file.tmpPath);
@@ -169,21 +169,59 @@ export default class ImagesController {
 }
 ```
 
+### Validate uploads with Vine
+
+Use Vine to reject invalid multipart uploads at the request boundary:
+
+```ts
+// app/validators/image.ts
+import vine from '@vinejs/vine';
+
+export const uploadImageValidator = vine.compile(
+  vine.object({
+    image: vine.file({
+      size: '10mb',
+      extnames: ['jpg', 'jpeg', 'png', 'webp'],
+    }),
+  }),
+);
+
+export const uploadAvatarValidator = vine.compile(
+  vine.object({
+    avatar: vine.file({
+      size: '2mb',
+      extnames: ['jpg', 'jpeg', 'png', 'webp'],
+    }),
+  }),
+);
+```
+
+Vine applies route-specific size and extension rules before the service processes the file.
+The processor still rejects malformed or unsupported image data, but does not enforce an upload
+size limit or a route-specific format allow-list. Set the validator rules to match your endpoint's
+policy.
+
 The service can also be used directly from application code:
 
 ```ts
 import image from 'adonisjs-image/services/main';
 
-const file = request.file('image', { extnames: ['jpg', 'png', 'webp'] });
-const img = await image.upload(file!, { userId: auth.user!.id });
+const { image: file } = await request.validateUsing(uploadImageValidator);
+if (!file.tmpPath) throw new Error('Could not read uploaded image');
+const img = await image.upload(file.tmpPath, { userId: auth.user!.id });
 const avatarImages = image.use('avatar');
-const avatar = await avatarImages.upload(file!, { userId: auth.user!.id });
+const { avatar: avatarFile } = await request.validateUsing(uploadAvatarValidator);
+if (!avatarFile.tmpPath) throw new Error('Could not read uploaded avatar');
+const avatar = await avatarImages.upload(avatarFile.tmpPath, { userId: auth.user!.id });
 const photoImages = image.use('photo');
-const photo = await photoImages.upload(file!, { userId: auth.user!.id });
+const photo = await photoImages.upload(file.tmpPath, { userId: auth.user!.id });
 const url = await image.url(img);
 const thumbnailUrl = await image.url(img, 'small');
 await image.delete(img);
 ```
+
+Validate user-provided files with Vine before calling the service directly; direct service calls do
+not apply request validators.
 
 The `image` preset is used by default. Configure named presets in `config/image.ts` to apply
 different size, crop, format, quality, and thumbnail settings for avatars, photos, or other uses.
@@ -279,12 +317,14 @@ Protect this route with your application's authentication middleware.
 import type { HttpContext } from '@adonisjs/core/http';
 import image from 'adonisjs-image/services/main';
 
+import { uploadAvatarValidator } from '#validators/image';
+
 export default class AvatarController {
   async update({ auth, request, response }: HttpContext) {
     const user = auth.user!;
-    const file = request.file('avatar');
-    if (!file?.tmpPath) {
-      return response.badRequest({ message: 'An avatar image is required' });
+    const { avatar: file } = await request.validateUsing(uploadAvatarValidator);
+    if (!file.tmpPath) {
+      return response.badRequest({ message: 'Could not read uploaded avatar' });
     }
 
     const uploaded = await image.use('avatar').upload(file.tmpPath, { userId: user.id });

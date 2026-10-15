@@ -14,10 +14,6 @@ export interface ThumbnailConfig {
 }
 
 export interface ImageProcessingConfig {
-  /** Max upload size in bytes */
-  maxFileSize: number;
-  /** Accepted input formats */
-  allowedFormats: ImageFormat[];
   /** Convert every upload to this format (e.g. 'webp') */
   convertTo?: RasterImageFormat;
   /** Resize originals to fit within these dimensions */

@@ -69,23 +69,9 @@ test('resolves image presets and crops avatars to a square', async () => {
   assert.throws(() => resolveImagePreset(config, 'missing'), /not configured/);
 });
 
-test('rejects disallowed formats, invalid files and big files', async () => {
-  const disallowedConfig = defineConfig({
-    presets: { image: { allowedFormats: ['jpeg'] } },
-  });
-  const fileSizeConfig = defineConfig({
-    presets: { image: { maxFileSize: 10 } },
-  });
-  await assert.rejects(
-    processOriginal(await png(), resolveImagePreset(disallowedConfig)),
-    InvalidImageException,
-  );
+test('rejects invalid files', async () => {
   await assert.rejects(
     processOriginal(Buffer.from('nope'), resolveImagePreset(defineConfig())),
-    InvalidImageException,
-  );
-  await assert.rejects(
-    processOriginal(await png(), resolveImagePreset(fileSizeConfig)),
     InvalidImageException,
   );
 });
