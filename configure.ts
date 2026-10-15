@@ -3,13 +3,6 @@ import type ConfigureCommand from '@adonisjs/core/commands/configure';
 import { stubsRoot } from './index.js';
 
 export async function configure(command: ConfigureCommand) {
-  if (!command.app.config.get('drive')) {
-    command.logger.warning(
-      'The Drive package is not configured. Configure @adonisjs/drive before setting up adonisjs-image.',
-    );
-    return;
-  }
-
   const codemods = await command.createCodemods();
   await codemods.makeUsingStub(stubsRoot, 'config/image.stub', {});
   await codemods.makeUsingStub(stubsRoot, 'models/image.stub', {});
