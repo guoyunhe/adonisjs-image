@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### Changed
+
+- Store images directly under the configured directory without date-based path segments.
+
 ## 0.2.0 - 2026-10-15
 
 ### Changed

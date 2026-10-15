@@ -61,8 +61,7 @@ export class ImageService {
     const disk = this.resolveDisk(diskName);
 
     const id = randomUUID();
-    const day = new Date().toISOString().slice(0, 7).replace('-', '/');
-    const base = `${config.directory}/${day}/${id}`;
+    const base = `${config.directory}/${id}`;
     const written: string[] = [];
     const put = async (key: string, data: Buffer) => {
       await disk.put(
