@@ -84,16 +84,16 @@ their `quality` values are merged by format.
 
 ### Preset properties
 
-| Property                | Description                                                                       | Default                                                   |
-| ----------------------- | --------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `disk`                  | Drive disk used to store files.                                                   | Drive's configured default disk                           |
-| `directory`             | Key prefix inside the disk.                                                       | `images`                                                  |
-| `convertTo`             | Raster output format for the original and default thumbnail format.               | Input format                                              |
-| `maxWidth`, `maxHeight` | Maximum dimensions for the processed original. Images are never enlarged.         | No resize limit                                           |
-| `fit`                   | Resize mode for the original: `cover`, `contain`, `fill`, `inside`, or `outside`. | `inside`                                                  |
-| `keepMetadata`          | Preserve metadata instead of auto-rotating and stripping EXIF.                    | `false`                                                   |
-| `quality`               | Compression quality from 1 to 100, keyed by format.                               | `jpeg: 80`, `webp: 80`, `avif: 50`, `png: 90`, `tiff: 80` |
-| `thumbnails`            | Map of thumbnail names to thumbnail settings.                                     | `{}`                                                      |
+| Property                | Description                                                                                                                          | Default                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| `disk`                  | Drive disk used to store files.                                                                                                      | Drive's configured default disk                           |
+| `directory`             | Key prefix inside the disk.                                                                                                          | `images`                                                  |
+| `convertTo`             | Raster output format for the original and default thumbnail format.                                                                  | Input format                                              |
+| `maxWidth`, `maxHeight` | Maximum dimensions for the processed original. Images are never enlarged.                                                            | No resize limit                                           |
+| `fit`                   | Resize mode for the original: `cover`, `contain`, `fill`, `inside`, or `outside`.                                                    | `inside`                                                  |
+| `keepMetadata`          | Preserve metadata instead of auto-rotating and stripping EXIF. May expose private information; avoid for publicly accessible images. | `false`                                                   |
+| `quality`               | Compression quality from 1 to 100, keyed by format.                                                                                  | `jpeg: 80`, `webp: 80`, `avif: 50`, `png: 90`, `tiff: 80` |
+| `thumbnails`            | Map of thumbnail names to thumbnail settings.                                                                                        | `{}`                                                      |
 
 SVG originals are sanitized (scripts, event handlers, styles, and external resources are removed)
 and kept as vector files unless `convertTo` is set. SVG metadata is retained only when

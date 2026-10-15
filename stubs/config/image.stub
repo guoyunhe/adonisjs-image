@@ -17,7 +17,6 @@ const imageConfig = defineConfig({
       /** Downscale (never enlarge) originals */
       maxWidth: 2560,
       maxHeight: 2560,
-      keepMetadata: false,
       quality: { jpeg: 80, webp: 80, avif: 50, png: 90 },
 
       /** Thumbnails generated for each upload */
@@ -43,6 +42,7 @@ const imageConfig = defineConfig({
       directory: 'photos',
       maxWidth: 6000,
       maxHeight: 6000,
+      /** Preserve EXIF metadata. May expose private information. Avoid for publicly accessible images. */
       keepMetadata: true,
       quality: { jpeg: 95, webp: 90, avif: 80, png: 100, tiff: 95 },
     },
