@@ -4,8 +4,7 @@
   "description": "Image upload, processing and management for AdonisJS",
   "license": "MIT",
   "files": [
-    "build",
-    "stubs"
+    "build"
   ],
   "type": "module",
   "exports": {
@@ -15,7 +14,7 @@
     "./image_provider": "./build/providers/image_provider.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -r build && tsc && cp -R stubs build",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "prepare": "husky",

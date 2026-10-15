@@ -1,9 +1,16 @@
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { test } from 'node:test';
 
 import type ConfigureCommand from '@adonisjs/core/commands/configure';
 
 import { configure } from '../configure.js';
+import { stubsRoot } from '../index.js';
+
+test('resolves the source stubs directory', () => {
+  assert.ok(existsSync(join(stubsRoot, 'config/image.stub')));
+});
 
 test('configures the package without checking Drive configuration', async () => {
   const generatedStubs: string[] = [];
