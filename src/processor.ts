@@ -118,14 +118,21 @@ export async function processThumbnail(
   } catch {
     throw new InvalidImageException('File is not a valid image');
   }
+  const isSvg = sourceFormat === 'svg';
   if (
-    (thumb.width !== undefined && sourceWidth !== undefined && sourceWidth < thumb.width) ||
-    (thumb.height !== undefined && sourceHeight !== undefined && sourceHeight < thumb.height)
+    (!isSvg &&
+      thumb.width !== undefined &&
+      sourceWidth !== undefined &&
+      sourceWidth < thumb.width) ||
+    (!isSvg &&
+      thumb.height !== undefined &&
+      sourceHeight !== undefined &&
+      sourceHeight < thumb.height)
   ) {
     return undefined;
   }
 
-  const cleanInput = sourceFormat === 'svg' ? sanitizeSvg(input, config.keepMetadata) : input;
+  const cleanInput = isSvg ? sanitizeSvg(input, config.keepMetadata) : input;
   const format = thumb.format ?? rasterFormat(fallbackFormat);
   const pipeline = sharp(cleanInput)
     .rotate()
@@ -133,7 +140,7 @@ export async function processThumbnail(
       width: thumb.width,
       height: thumb.height,
       fit: thumb.fit ?? 'inside',
-      withoutEnlargement: true,
+      withoutEnlargement: !isSvg,
     });
   return encode(pipeline, format, thumb.quality ?? qualityForFormat(config.quality, format));
 }

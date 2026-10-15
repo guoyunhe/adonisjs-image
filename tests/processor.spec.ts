@@ -157,6 +157,19 @@ test('skips thumbnails larger than the source in a requested dimension', async (
   assert.equal(out, undefined);
 });
 
+test('enlarges SVG thumbnails to the requested dimensions', async () => {
+  const config = resolveImagePreset(defineConfig());
+  const thumbnail = await processThumbnail(
+    svg('<circle cx="50" cy="40" r="30" fill="blue"/>'),
+    { width: 200, height: 200 },
+    config,
+    'svg',
+  );
+
+  assert.ok(thumbnail);
+  assert.deepEqual([thumbnail.width, thumbnail.height], [200, 160]);
+});
+
 test('rasterizes SVG thumbnails and converts SVG originals when configured', async () => {
   const input = svg('<circle cx="50" cy="40" r="30" fill="blue"/>');
   const config = resolveImagePreset(defineConfig());

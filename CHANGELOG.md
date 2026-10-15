@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### Changed
+
+- Allow SVG thumbnails to be generated at sizes larger than their declared dimensions.
+
 ### Tests
 
 - Check SVG appearance preservation across all SVG fixtures.

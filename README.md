@@ -98,7 +98,8 @@ their per-format `quality` values are merged by format. A numeric `quality` appl
 SVG originals are sanitized (scripts, event handlers, styles, and external resources are removed)
 and kept as vector files unless `format` converts them. SVG metadata is retained only when
 `keepMetadata` is `true`. Their thumbnails are rasterized as PNG by default. `width`, `height`,
-and `fit` affect raster originals only when a resize limit is set.
+and `fit` affect raster originals only when a resize limit is set. SVG thumbnails can be generated
+at dimensions larger than the SVG's declared size without losing vector detail.
 The generated starter config sets its own example limits and includes 1280, 640, and 320 square
 cover thumbnails for the default `image` preset; these examples do not alter the `defineConfig`
 defaults.
