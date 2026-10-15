@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { glob, readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 
 import sharp from 'sharp';
@@ -33,7 +33,13 @@ test('rejects input without an SVG root', () => {
 });
 
 test('preserves SVG appearance when sanitizing', async () => {
-  for (const file of ['keepassxc.svg', 'dev.eden_emu.eden.svg']) {
+  const files: string[] = [];
+  for await (const file of glob('**/*.svg', { cwd: new URL('./images/', import.meta.url) })) {
+    files.push(file);
+  }
+  assert.ok(files.length > 0, 'Expected at least one SVG in tests/images');
+
+  for (const file of files) {
     const input = await readFile(new URL(`./images/${file}`, import.meta.url));
     const sanitized = sanitizeSvg(input, false);
     const originalPixels = await sharp(input)
