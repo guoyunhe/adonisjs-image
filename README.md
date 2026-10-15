@@ -18,9 +18,11 @@ A complete AdonisJS image management package featuring seamless uploads, Drive s
 - [Configuration](#configuration)
   - [Preset properties](#preset-properties)
   - [Thumbnail properties](#thumbnail-properties)
+- [Validator](#validator)
+- [Service](#service)
 - [Routes and controller](#routes-and-controller)
-  - [Validate uploads with Vine](#validate-uploads-with-vine)
 - [User avatar](#user-avatar)
+  - [Avatar Configuration](#avatar-configuration)
   - [Avatar Migration](#avatar-migration)
   - [Avatar Relationship](#avatar-relationship)
   - [Avatar Routes](#avatar-routes)
@@ -98,6 +100,67 @@ Each entry in `thumbnails` is an object with these optional properties:
 | `format`          | Raster thumbnail output format.                                  | Processed original format; PNG for SVG |
 | `quality`         | Compression quality from 1 to 100.                               | Preset quality for the output format   |
 
+## Validator
+
+Use Vine to enforce route-specific file size and extension rules before passing uploaded files to
+the image service. Define separate validators for general images and avatars, adjusting the limits
+to match each endpoint's policy:
+
+```ts
+// app/validators/image.ts
+import vine from '@vinejs/vine';
+
+export const uploadImageValidator = vine.compile(
+  vine.object({
+    image: vine.file({
+      size: '10mb',
+      extnames: ['jpg', 'jpeg', 'png', 'webp'],
+    }),
+  }),
+);
+
+export const uploadAvatarValidator = vine.compile(
+  vine.object({
+    avatar: vine.file({
+      size: '2mb',
+      extnames: ['jpg', 'jpeg', 'png', 'webp'],
+    }),
+  }),
+);
+```
+
+Controllers use `request.validateUsing(uploadImageValidator)` or
+`request.validateUsing(uploadAvatarValidator)` before calling the service. The processor still
+rejects malformed or unsupported image data, but does not enforce an upload size limit or a
+route-specific format allow-list. Direct service calls do not apply request validators, so validate
+user-provided files before calling `image.upload`.
+
+## Service
+
+Use the image service to upload, process, and manage images. The `image` preset is used by default;
+call `use()` to select a named preset:
+
+```ts
+import image from 'adonisjs-image/services/main';
+
+import { uploadImageValidator } from '#validators/image';
+
+const { image: file } = await request.validateUsing(uploadImageValidator);
+if (!file.tmpPath) throw new Error('Could not read uploaded image');
+
+const img = await image.upload(file.tmpPath, { userId: auth.user!.id });
+const photoImages = image.use('photo');
+const photo = await photoImages.upload(file.tmpPath, { userId: auth.user!.id });
+const url = await image.url(img);
+const thumbnailUrl = await image.url(img, 'small');
+await image.delete(img);
+```
+
+Configure named presets in `config/image.ts` to apply different size, crop, format, quality, and
+thumbnail settings for avatars, photos, or other uses. Each uploaded image and its thumbnails record
+the preset name used, so generated files can be regenerated later if preset settings change.
+Invalid uploads throw `InvalidImageException`.
+
 ## Routes and controller
 
 The configure command does not modify `start/routes.ts` or generate a controller. Add the
@@ -169,68 +232,28 @@ export default class ImagesController {
 }
 ```
 
-### Validate uploads with Vine
-
-Use Vine to reject invalid multipart uploads at the request boundary:
-
-```ts
-// app/validators/image.ts
-import vine from '@vinejs/vine';
-
-export const uploadImageValidator = vine.compile(
-  vine.object({
-    image: vine.file({
-      size: '10mb',
-      extnames: ['jpg', 'jpeg', 'png', 'webp'],
-    }),
-  }),
-);
-
-export const uploadAvatarValidator = vine.compile(
-  vine.object({
-    avatar: vine.file({
-      size: '2mb',
-      extnames: ['jpg', 'jpeg', 'png', 'webp'],
-    }),
-  }),
-);
-```
-
-Vine applies route-specific size and extension rules before the service processes the file.
-The processor still rejects malformed or unsupported image data, but does not enforce an upload
-size limit or a route-specific format allow-list. Set the validator rules to match your endpoint's
-policy.
-
-The service can also be used directly from application code:
-
-```ts
-import image from 'adonisjs-image/services/main';
-
-const { image: file } = await request.validateUsing(uploadImageValidator);
-if (!file.tmpPath) throw new Error('Could not read uploaded image');
-const img = await image.upload(file.tmpPath, { userId: auth.user!.id });
-const avatarImages = image.use('avatar');
-const { avatar: avatarFile } = await request.validateUsing(uploadAvatarValidator);
-if (!avatarFile.tmpPath) throw new Error('Could not read uploaded avatar');
-const avatar = await avatarImages.upload(avatarFile.tmpPath, { userId: auth.user!.id });
-const photoImages = image.use('photo');
-const photo = await photoImages.upload(file.tmpPath, { userId: auth.user!.id });
-const url = await image.url(img);
-const thumbnailUrl = await image.url(img, 'small');
-await image.delete(img);
-```
-
-Validate user-provided files with Vine before calling the service directly; direct service calls do
-not apply request validators.
-
-The `image` preset is used by default. Configure named presets in `config/image.ts` to apply
-different size, crop, format, quality, and thumbnail settings for avatars, photos, or other uses.
-Each uploaded image and its thumbnails record the preset name used, so generated files can be
-regenerated later if preset settings change.
-
-Invalid uploads throw `InvalidImageException`.
-
 ## User avatar
+
+### Avatar Configuration
+
+Add an `avatar` preset to `config/image.ts`. It inherits unspecified options from the `image`
+preset:
+
+```ts
+presets: {
+  avatar: {
+    directory: 'avatars',
+    maxWidth: 512,
+    maxHeight: 512,
+    fit: 'cover',
+    convertTo: 'webp',
+    thumbnails: {
+      small: { width: 64, height: 64, fit: 'cover', format: 'webp' },
+      medium: { width: 256, height: 256, fit: 'cover', format: 'webp' },
+    },
+  },
+}
+```
 
 ### Avatar Migration
 
