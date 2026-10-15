@@ -4,7 +4,10 @@
   "description": "Image upload, processing and management for AdonisJS",
   "license": "MIT",
   "files": [
-    "build"
+    "build",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
   ],
   "type": "module",
   "exports": {
