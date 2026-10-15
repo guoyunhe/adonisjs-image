@@ -22,8 +22,9 @@ const imageConfig = defineConfig({
 
       /** Thumbnails generated for each upload */
       thumbnails: {
-        small: { width: 150, height: 150, fit: 'cover', format: 'webp' },
-        medium: { width: 640, fit: 'inside', format: 'webp' },
+        large: { width: 1280, height: 1280, fit: 'inside', format: 'webp', quality: 80 },
+        medium: { width: 640, height: 640, fit: 'inside', format: 'webp', quality: 80 },
+        small: { width: 320, height: 320, fit: 'cover', format: 'webp', quality: 80 },
       },
     },
     avatar: {
@@ -32,10 +33,10 @@ const imageConfig = defineConfig({
       maxHeight: 512,
       fit: 'cover',
       convertTo: 'webp',
-      quality: { webp: 85 },
       thumbnails: {
+        large: { width: 256, height: 256, fit: 'cover', format: 'webp' },
+        medium: { width: 128, height: 128, fit: 'cover', format: 'webp' },
         small: { width: 64, height: 64, fit: 'cover', format: 'webp' },
-        medium: { width: 256, height: 256, fit: 'cover', format: 'webp' },
       },
     },
     photo: {

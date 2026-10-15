@@ -98,7 +98,9 @@ their `quality` values are merged by format.
 SVG originals are sanitized (scripts, event handlers, styles, and external resources are removed)
 and kept as vector files unless `convertTo` is set. Their thumbnails are rasterized as PNG by
 default. `maxWidth`, `maxHeight`, and `fit` affect raster originals only when a resize limit is set.
-The generated starter config sets its own example limits; these defaults describe `defineConfig`.
+The generated starter config sets its own example limits and includes 1280, 640, and 320 square
+cover thumbnails for the default `image` preset; these examples do not alter the `defineConfig`
+defaults.
 
 ### Thumbnail properties
 
@@ -110,6 +112,8 @@ Each entry in `thumbnails` is an object with these optional properties:
 | `fit`             | Resize mode: `cover`, `contain`, `fill`, `inside`, or `outside`. | `cover`                                |
 | `format`          | Raster thumbnail output format.                                  | Processed original format; PNG for SVG |
 | `quality`         | Compression quality from 1 to 100.                               | Preset quality for the output format   |
+
+Thumbnails are skipped when the source image is smaller than any configured width or height.
 
 ## Validator
 
@@ -263,8 +267,9 @@ presets: {
     fit: 'cover',
     convertTo: 'webp',
     thumbnails: {
+      large: { width: 256, height: 256, fit: 'cover', format: 'webp' },
+      medium: { width: 128, height: 128, fit: 'cover', format: 'webp' },
       small: { width: 64, height: 64, fit: 'cover', format: 'webp' },
-      medium: { width: 256, height: 256, fit: 'cover', format: 'webp' },
     },
   },
 }

@@ -80,10 +80,12 @@ export class ImageService {
       const thumbs: {
         name: string;
         path: string;
-        result: Awaited<ReturnType<typeof processThumbnail>>;
+        result: NonNullable<Awaited<ReturnType<typeof processThumbnail>>>;
       }[] = [];
       for (const [name, thumb] of Object.entries(config.thumbnails)) {
         const result = await processThumbnail(raw, thumb, config, original.format);
+        if (!result) continue;
+
         const thumbPath = `${base}_${name}.${extensionOf(result.format)}`;
         await put(thumbPath, result.buffer);
         thumbs.push({ name, path: thumbPath, result });

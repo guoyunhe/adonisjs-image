@@ -84,8 +84,15 @@ test('generates thumbnails', async () => {
     config,
     'png',
   );
+  assert.ok(out);
   assert.equal(out.format, 'jpeg');
   assert.deepEqual([out.width, out.height], [40, 40]);
+});
+
+test('skips thumbnails larger than the source in a requested dimension', async () => {
+  const config = resolveImagePreset(defineConfig());
+  const out = await processThumbnail(await png(40, 100), { width: 50, height: 100 }, config, 'png');
+  assert.equal(out, undefined);
 });
 
 test('preserves a sanitized SVG original', async () => {

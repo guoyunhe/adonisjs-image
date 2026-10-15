@@ -147,11 +147,23 @@ export async function processThumbnail(
   fallbackFormat: ImageFormat,
 ) {
   let sourceFormat: ImageFormat | undefined;
+  let sourceWidth: number | undefined;
+  let sourceHeight: number | undefined;
   try {
-    sourceFormat = normalizeFormat((await sharp(input).metadata()).format);
+    const metadata = await sharp(input).metadata();
+    sourceFormat = normalizeFormat(metadata.format);
+    sourceWidth = metadata.width;
+    sourceHeight = metadata.height;
   } catch {
     throw new InvalidImageException('File is not a valid image');
   }
+  if (
+    (thumb.width !== undefined && sourceWidth !== undefined && sourceWidth < thumb.width) ||
+    (thumb.height !== undefined && sourceHeight !== undefined && sourceHeight < thumb.height)
+  ) {
+    return undefined;
+  }
+
   const cleanInput = sourceFormat === 'svg' ? sanitizeSvg(input, config.stripMetadata) : input;
   const format = thumb.format ?? rasterFormat(fallbackFormat);
   const pipeline = sharp(cleanInput)
