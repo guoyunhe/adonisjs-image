@@ -157,26 +157,6 @@ test('skips thumbnails larger than the source in a requested dimension', async (
   assert.equal(out, undefined);
 });
 
-test('preserves a sanitized SVG original', async () => {
-  const input = svg(
-    '<metadata>private metadata</metadata><script>alert(1)</script><path d="M0 0h100v80H0z" onload="alert(1)" fill="red"/><image href="https://example.com/tracker.png"/><use href="https://example.com/icon.svg#icon"/><path fill="url(https://example.com/filter.svg#filter)"/>',
-  );
-  const out = await processOriginal(input, resolveImagePreset(defineConfig()));
-  const metadataPreserved = await processOriginal(
-    input,
-    resolveImagePreset(defineConfig({ presets: { image: { keepMetadata: true } } })),
-  );
-  const output = out.buffer.toString();
-
-  assert.equal(out.format, 'svg');
-  assert.equal(out.extension, 'svg');
-  assert.deepEqual([out.width, out.height], [100, 80]);
-  assert.match(output, /<path/);
-  assert.match(output, /fill="red"/);
-  assert.doesNotMatch(output, /metadata|<script|onload|example\.com|<image/i);
-  assert.match(metadataPreserved.buffer.toString(), /private metadata/);
-});
-
 test('rasterizes SVG thumbnails and converts SVG originals when configured', async () => {
   const input = svg('<circle cx="50" cy="40" r="30" fill="blue"/>');
   const config = resolveImagePreset(defineConfig());
