@@ -84,21 +84,21 @@ their per-format `quality` values are merged by format. A numeric `quality` appl
 
 ### Preset properties
 
-| Property                | Description                                                                                                                          | Default                                                   |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
-| `disk`                  | Drive disk used to store files.                                                                                                      | Drive's configured default disk                           |
-| `directory`             | Key prefix inside the disk.                                                                                                          | `images`                                                  |
-| `format`                | One raster output format for all uploads, or a map from selected input formats to output formats. Unmapped formats stay unchanged.   | Input format                                              |
-| `maxWidth`, `maxHeight` | Maximum dimensions for the processed original. Images are never enlarged.                                                            | No resize limit                                           |
-| `fit`                   | Resize mode for the original: `cover`, `contain`, `fill`, `inside`, or `outside`.                                                    | `inside`                                                  |
-| `keepMetadata`          | Preserve metadata instead of auto-rotating and stripping EXIF. May expose private information; avoid for publicly accessible images. | `false`                                                   |
-| `quality`               | Compression quality from 1 to 100, as one value for all formats or values keyed by format.                                           | `jpeg: 80`, `webp: 80`, `avif: 50`, `png: 90`, `tiff: 80` |
-| `thumbnails`            | Map of thumbnail names to thumbnail settings.                                                                                        | `{}`                                                      |
+| Property          | Description                                                                                                                          | Default                                                   |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| `disk`            | Drive disk used to store files.                                                                                                      | Drive's configured default disk                           |
+| `directory`       | Key prefix inside the disk.                                                                                                          | `images`                                                  |
+| `format`          | One raster output format for all uploads, or a map from selected input formats to output formats. Unmapped formats stay unchanged.   | Input format                                              |
+| `width`, `height` | Maximum dimensions for the processed original. Images are never enlarged.                                                            | No resize limit                                           |
+| `fit`             | Resize mode for the original: `cover`, `contain`, `fill`, `inside`, or `outside`.                                                    | `inside`                                                  |
+| `keepMetadata`    | Preserve metadata instead of auto-rotating and stripping EXIF. May expose private information; avoid for publicly accessible images. | `false`                                                   |
+| `quality`         | Compression quality from 1 to 100, as one value for all formats or values keyed by format.                                           | `jpeg: 80`, `webp: 80`, `avif: 50`, `png: 90`, `tiff: 80` |
+| `thumbnails`      | Map of thumbnail names to thumbnail settings.                                                                                        | `{}`                                                      |
 
 SVG originals are sanitized (scripts, event handlers, styles, and external resources are removed)
 and kept as vector files unless `format` converts them. SVG metadata is retained only when
-`keepMetadata` is `true`. Their thumbnails are rasterized as PNG by default. `maxWidth`,
-`maxHeight`, and `fit` affect raster originals only when a resize limit is set.
+`keepMetadata` is `true`. Their thumbnails are rasterized as PNG by default. `width`, `height`,
+and `fit` affect raster originals only when a resize limit is set.
 The generated starter config sets its own example limits and includes 1280, 640, and 320 square
 cover thumbnails for the default `image` preset; these examples do not alter the `defineConfig`
 defaults.
@@ -269,8 +269,8 @@ preset:
 presets: {
   avatar: {
     directory: 'avatars',
-    maxWidth: 512,
-    maxHeight: 512,
+    width: 512,
+    height: 512,
     fit: 'cover',
     format: 'webp',
     thumbnails: {

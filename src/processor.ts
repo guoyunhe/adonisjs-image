@@ -138,10 +138,10 @@ export async function processOriginal(
   let pipeline = sharp(cleanInput, { animated: target === 'gif' || target === 'webp' });
   if (config.keepMetadata) pipeline = pipeline.keepMetadata();
   else pipeline = pipeline.rotate();
-  if (config.maxWidth || config.maxHeight) {
+  if (config.width || config.height) {
     pipeline = pipeline.resize({
-      width: config.maxWidth,
-      height: config.maxHeight,
+      width: config.width,
+      height: config.height,
       fit: config.fit ?? 'inside',
       withoutEnlargement: true,
     });

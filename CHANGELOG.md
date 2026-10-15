@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Rename the `stripMetadata` preset option to `keepMetadata`, defaulting to `false`; presets such as `photo` can opt in to preserving metadata.
 - Allow compression quality to be configured as one value for all formats or as per-format values.
 - Replace `convertTo` with `format`, supporting one output format for all uploads or per-input-format mappings.
+- Rename original image resize limits from `maxWidth`/`maxHeight` to `width`/`height`.
 
 ## 0.1.0 - 2026-10-15
 

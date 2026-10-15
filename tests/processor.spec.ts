@@ -17,7 +17,7 @@ const svg = (content: string) =>
   );
 
 test('converts and resizes originals', async () => {
-  const config = defineConfig({ presets: { image: { format: 'webp', maxWidth: 100 } } });
+  const config = defineConfig({ presets: { image: { format: 'webp', width: 100 } } });
   const out = await processOriginal(await png(), resolveImagePreset(config));
   assert.equal(out.format, 'webp');
   assert.equal(out.width, 100);
@@ -26,14 +26,14 @@ test('converts and resizes originals', async () => {
 });
 
 test('does not enlarge', async () => {
-  const config = defineConfig({ presets: { image: { maxWidth: 500 } } });
+  const config = defineConfig({ presets: { image: { width: 500 } } });
   const out = await processOriginal(await png(50, 50), resolveImagePreset(config));
   assert.equal(out.width, 50);
 });
 
 test('does not enlarge images in cover mode', async () => {
   const config = defineConfig({
-    presets: { image: { maxWidth: 128, maxHeight: 128, fit: 'cover' } },
+    presets: { image: { width: 128, height: 128, fit: 'cover' } },
   });
   const out = await processOriginal(await png(50, 50), resolveImagePreset(config));
   assert.deepEqual([out.width, out.height], [50, 50]);
@@ -43,13 +43,13 @@ test('resolves image presets and crops avatars to a square', async () => {
   const config = defineConfig({
     presets: {
       image: {
-        maxWidth: 2560,
-        maxHeight: 2560,
+        width: 2560,
+        height: 2560,
         quality: { jpeg: 80, webp: 75 },
       },
       avatar: {
-        maxWidth: 128,
-        maxHeight: 128,
+        width: 128,
+        height: 128,
         fit: 'cover',
         format: 'webp',
         quality: { webp: 95 },
@@ -61,7 +61,7 @@ test('resolves image presets and crops avatars to a square', async () => {
   const avatar = await processOriginal(await png(), avatarPreset);
 
   assert.equal(config.default, 'image');
-  assert.equal(imagePreset.maxWidth, 2560);
+  assert.equal(imagePreset.width, 2560);
   assert.equal(avatarPreset.quality.jpeg, 80);
   assert.equal(avatarPreset.quality.webp, 95);
   assert.equal(avatar.format, 'webp');

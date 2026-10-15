@@ -10,8 +10,8 @@ const imageConfig = defineConfig({
       /** Drive disk (defaults to the Drive default disk) */
       // disk: 'fs',
       directory: 'images',
-      maxWidth: 2560,
-      maxHeight: 2560,
+      width: 2560,
+      height: 2560,
       format: 'webp',
       quality: 80,
 
@@ -24,8 +24,8 @@ const imageConfig = defineConfig({
     avatar: {
       // disk: 'fs',
       directory: 'avatars',
-      maxWidth: 512,
-      maxHeight: 512,
+      width: 512,
+      height: 512,
       fit: 'cover',
       format: 'webp',
 
@@ -38,8 +38,8 @@ const imageConfig = defineConfig({
     photo: {
       // disk: 's3',
       directory: 'photos',
-      maxWidth: 6000,
-      maxHeight: 6000,
+      width: 6000,
+      height: 6000,
       /** Preserve EXIF metadata. May expose private information. Avoid for publicly accessible images. */
       keepMetadata: true,
       format: { png: 'jpeg', tiff: 'jpeg' },

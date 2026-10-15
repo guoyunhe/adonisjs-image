@@ -20,8 +20,8 @@ export interface ImageProcessingConfig {
   /** Convert every upload to one format, or map selected input formats to output formats */
   format?: ImageOutputFormat;
   /** Resize originals to fit within these dimensions */
-  maxWidth?: number;
-  maxHeight?: number;
+  width?: number;
+  height?: number;
   /** Resize mode for the original. Defaults to 'inside' */
   fit?: FitMode;
   /**
