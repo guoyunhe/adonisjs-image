@@ -1,8 +1,31 @@
 {
   "name": "adonisjs-image",
   "version": "0.3.0",
-  "description": "Image upload, processing and management for AdonisJS",
-  "license": "MIT",
+  "description": "Image uploads, processing, storage, and Lucid ORM integration for AdonisJS.",
+  "keywords": [
+    "adonisjs",
+    "drive",
+    "image",
+    "image-processing",
+    "image-upload",
+    "lucid",
+    "sharp",
+    "svg"
+  ],
+  "homepage": "https://github.com/guoyunhe/adonisjs-image#readme",
+  "bugs": {
+    "url": "https://github.com/guoyunhe/adonisjs-image/issues"
+  },
+  "license": "AGPL-3.0",
+  "author": {
+    "name": "Guo Yunhe",
+    "email": "i@guoyunhe.me",
+    "url": "https://github.com/guoyunhe"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guoyunhe/adonisjs-image.git"
+  },
   "files": [
     "build",
     "CHANGELOG.md",
@@ -10,6 +33,7 @@
     "README.md"
   ],
   "type": "module",
+  "types": "./build/index.d.ts",
   "exports": {
     ".": "./build/index.js",
     "./types": "./build/src/types.js",
@@ -51,5 +75,8 @@
       "name": "pnpm",
       "version": ">=12.11.2"
     }
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }

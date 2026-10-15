@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### Tests
+
+- Check SVG appearance preservation across all SVG fixtures.
+
 ## 0.3.0 - 2026-10-15
 
 ### Changed
