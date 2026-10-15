@@ -69,6 +69,29 @@ test('resolves image presets and crops avatars to a square', async () => {
   assert.throws(() => resolveImagePreset(config, 'missing'), /not configured/);
 });
 
+test('supports one quality value for all formats and merges per-format overrides', async () => {
+  const config = defineConfig({
+    presets: {
+      image: { quality: 72 },
+      avatar: { quality: { webp: 90 } },
+    },
+  });
+  const imagePreset = resolveImagePreset(config);
+  const avatarPreset = resolveImagePreset(config, 'avatar');
+
+  assert.equal(imagePreset.quality, 72);
+  assert.deepEqual(avatarPreset.quality, {
+    jpeg: 72,
+    png: 72,
+    webp: 90,
+    avif: 72,
+    gif: 72,
+    tiff: 72,
+  });
+  const out = await processOriginal(await png(), imagePreset);
+  assert.equal(out.format, 'png');
+});
+
 test('rejects invalid files', async () => {
   await assert.rejects(
     processOriginal(Buffer.from('nope'), resolveImagePreset(defineConfig())),
@@ -86,7 +109,24 @@ test('generates thumbnails', async () => {
   );
   assert.ok(out);
   assert.equal(out.format, 'jpeg');
-  assert.deepEqual([out.width, out.height], [40, 40]);
+  assert.deepEqual([out.width, out.height], [40, 20]);
+});
+
+test('defaults thumbnail fit to inside', async () => {
+  const config = resolveImagePreset(defineConfig());
+  const source = await png(100, 50);
+  const inside = await processThumbnail(source, { width: 40, height: 40 }, config, 'png');
+  const cover = await processThumbnail(
+    source,
+    { width: 40, height: 40, fit: 'cover' },
+    config,
+    'png',
+  );
+
+  assert.ok(inside);
+  assert.deepEqual([inside.width, inside.height], [40, 20]);
+  assert.ok(cover);
+  assert.deepEqual([cover.width, cover.height], [40, 40]);
 });
 
 test('skips thumbnails larger than the source in a requested dimension', async () => {
@@ -125,6 +165,6 @@ test('rasterizes SVG thumbnails and converts SVG originals when configured', asy
   );
 
   assert.equal(thumbnail.format, 'png');
-  assert.deepEqual([thumbnail.width, thumbnail.height], [20, 20]);
+  assert.deepEqual([thumbnail.width, thumbnail.height], [20, 16]);
   assert.equal(converted.format, 'webp');
 });

@@ -10,20 +10,15 @@ const imageConfig = defineConfig({
       /** Drive disk (defaults to the Drive default disk) */
       // disk: 'fs',
       directory: 'images',
-
-      /** Convert all uploads to one format */
-      // convertTo: 'webp',
-
-      /** Downscale (never enlarge) originals */
       maxWidth: 2560,
       maxHeight: 2560,
-      quality: { jpeg: 80, webp: 80, avif: 50, png: 90 },
+      convertTo: 'webp',
+      quality: 80,
 
-      /** Thumbnails generated for each upload */
       thumbnails: {
-        large: { width: 1280, height: 1280, fit: 'inside', format: 'webp', quality: 80 },
-        medium: { width: 640, height: 640, fit: 'inside', format: 'webp', quality: 80 },
-        small: { width: 320, height: 320, fit: 'cover', format: 'webp', quality: 80 },
+        large: { width: 1280, height: 1280, format: 'webp' },
+        medium: { width: 640, height: 640, format: 'webp' },
+        small: { width: 320, height: 320, fit: 'cover', format: 'webp' },
       },
     },
     avatar: {
@@ -32,6 +27,7 @@ const imageConfig = defineConfig({
       maxHeight: 512,
       fit: 'cover',
       convertTo: 'webp',
+
       thumbnails: {
         large: { width: 256, height: 256, fit: 'cover', format: 'webp' },
         medium: { width: 128, height: 128, fit: 'cover', format: 'webp' },
@@ -45,6 +41,12 @@ const imageConfig = defineConfig({
       /** Preserve EXIF metadata. May expose private information. Avoid for publicly accessible images. */
       keepMetadata: true,
       quality: { jpeg: 95, webp: 90, avif: 80, png: 100, tiff: 95 },
+
+      thumbnails: {
+        large: { width: 1280, height: 1280, format: 'webp' },
+        medium: { width: 640, height: 640, format: 'webp' },
+        small: { width: 320, height: 320, fit: 'cover', format: 'webp' },
+      },
     },
   },
 })

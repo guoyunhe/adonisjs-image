@@ -94,6 +94,13 @@ async function encode(
   };
 }
 
+function qualityForFormat(
+  quality: ImageProcessingConfig['quality'],
+  format: RasterImageFormat,
+): number | undefined {
+  return typeof quality === 'number' ? quality : quality[format];
+}
+
 /** Validates the image data and returns the processed original (converted, resized, compressed). */
 export async function processOriginal(
   input: Buffer,
@@ -137,7 +144,7 @@ export async function processOriginal(
       withoutEnlargement: true,
     });
   }
-  return encode(pipeline, target, config.quality[target]);
+  return encode(pipeline, target, qualityForFormat(config.quality, target));
 }
 
 export async function processThumbnail(
@@ -171,8 +178,8 @@ export async function processThumbnail(
     .resize({
       width: thumb.width,
       height: thumb.height,
-      fit: thumb.fit ?? 'cover',
+      fit: thumb.fit ?? 'inside',
       withoutEnlargement: true,
     });
-  return encode(pipeline, format, thumb.quality ?? config.quality[format]);
+  return encode(pipeline, format, thumb.quality ?? qualityForFormat(config.quality, format));
 }

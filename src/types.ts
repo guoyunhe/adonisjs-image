@@ -1,11 +1,13 @@
 export type RasterImageFormat = 'jpeg' | 'png' | 'webp' | 'avif' | 'gif' | 'tiff';
 export type ImageFormat = RasterImageFormat | 'svg';
+export type ImageQuality = number | Partial<Record<RasterImageFormat, number>>;
 
 export type FitMode = 'cover' | 'contain' | 'fill' | 'inside' | 'outside';
 
 export interface ThumbnailConfig {
   width?: number;
   height?: number;
+  /** Resize mode. Defaults to 'inside' */
   fit?: FitMode;
   /** Raster output format. Defaults to the format of the processed original, or PNG for SVG */
   format?: RasterImageFormat;
@@ -26,8 +28,8 @@ export interface ImageProcessingConfig {
    * information; avoid for publicly accessible images. Defaults to false
    */
   keepMetadata: boolean;
-  /** Compression quality (1-100) per output format */
-  quality: Partial<Record<RasterImageFormat, number>>;
+  /** Compression quality (1-100) for all formats or per output format */
+  quality: ImageQuality;
   /** Named thumbnails generated for every upload */
   thumbnails: Record<string, ThumbnailConfig>;
 }

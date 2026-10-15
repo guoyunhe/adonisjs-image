@@ -80,7 +80,7 @@ original images and thumbnails:
 Edit `config/image.ts` to adjust settings. The top-level `default` selects the preset used
 when an upload does not specify one; it defaults to `image`. All image processing options live
 inside `presets.image`. Additional named presets inherit unspecified options from `image`, while
-their `quality` values are merged by format.
+their per-format `quality` values are merged by format. A numeric `quality` applies to every format.
 
 ### Preset properties
 
@@ -92,7 +92,7 @@ their `quality` values are merged by format.
 | `maxWidth`, `maxHeight` | Maximum dimensions for the processed original. Images are never enlarged.                                                            | No resize limit                                           |
 | `fit`                   | Resize mode for the original: `cover`, `contain`, `fill`, `inside`, or `outside`.                                                    | `inside`                                                  |
 | `keepMetadata`          | Preserve metadata instead of auto-rotating and stripping EXIF. May expose private information; avoid for publicly accessible images. | `false`                                                   |
-| `quality`               | Compression quality from 1 to 100, keyed by format.                                                                                  | `jpeg: 80`, `webp: 80`, `avif: 50`, `png: 90`, `tiff: 80` |
+| `quality`               | Compression quality from 1 to 100, as one value for all formats or values keyed by format.                                           | `jpeg: 80`, `webp: 80`, `avif: 50`, `png: 90`, `tiff: 80` |
 | `thumbnails`            | Map of thumbnail names to thumbnail settings.                                                                                        | `{}`                                                      |
 
 SVG originals are sanitized (scripts, event handlers, styles, and external resources are removed)
@@ -110,7 +110,7 @@ Each entry in `thumbnails` is an object with these optional properties:
 | Property          | Description                                                      | Default                                |
 | ----------------- | ---------------------------------------------------------------- | -------------------------------------- |
 | `width`, `height` | Output dimensions in pixels.                                     | Unset                                  |
-| `fit`             | Resize mode: `cover`, `contain`, `fill`, `inside`, or `outside`. | `cover`                                |
+| `fit`             | Resize mode: `cover`, `contain`, `fill`, `inside`, or `outside`. | `inside`                               |
 | `format`          | Raster thumbnail output format.                                  | Processed original format; PNG for SVG |
 | `quality`         | Compression quality from 1 to 100.                               | Preset quality for the output format   |
 

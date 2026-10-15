@@ -1,5 +1,12 @@
-import type { ImageConfig, ImageConfigInput, ResolvedImageConfig } from './types.js';
+import type {
+  ImageConfig,
+  ImageConfigInput,
+  ImageQuality,
+  RasterImageFormat,
+  ResolvedImageConfig,
+} from './types.js';
 
+const rasterFormats: RasterImageFormat[] = ['jpeg', 'png', 'webp', 'avif', 'gif', 'tiff'];
 const defaultImagePreset: ResolvedImageConfig = {
   directory: 'images',
   keepMetadata: false,
@@ -7,13 +14,24 @@ const defaultImagePreset: ResolvedImageConfig = {
   thumbnails: {},
 };
 
+function mergeQuality(base: ImageQuality, override?: ImageQuality): ImageQuality {
+  if (override === undefined) return base;
+  if (typeof override === 'number') return override;
+
+  const baseQuality =
+    typeof base === 'number'
+      ? Object.fromEntries(rasterFormats.map((format) => [format, base]))
+      : base;
+  return { ...baseQuality, ...override };
+}
+
 export function defineConfig(config: ImageConfigInput = {}): ImageConfig {
   const presets = config.presets ?? {};
   const imagePreset = presets.image ?? {};
   const image: ResolvedImageConfig = {
     ...defaultImagePreset,
     ...imagePreset,
-    quality: { ...defaultImagePreset.quality, ...imagePreset.quality },
+    quality: mergeQuality(defaultImagePreset.quality, imagePreset.quality),
   };
 
   return {
@@ -33,6 +51,6 @@ export function resolveImagePreset(
   return {
     ...image,
     ...preset,
-    quality: { ...image.quality, ...preset.quality },
+    quality: mergeQuality(image.quality, preset.quality),
   };
 }
