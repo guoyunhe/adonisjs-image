@@ -21,8 +21,8 @@ export interface ImageProcessingConfig {
   maxHeight?: number;
   /** Resize mode for the original. Defaults to 'inside' */
   fit?: FitMode;
-  /** Remove EXIF/metadata and auto-rotate by EXIF orientation */
-  stripMetadata: boolean;
+  /** Preserve EXIF/metadata instead of auto-rotating and stripping it. Defaults to false */
+  keepMetadata: boolean;
   /** Compression quality (1-100) per output format */
   quality: Partial<Record<RasterImageFormat, number>>;
   /** Named thumbnails generated for every upload */

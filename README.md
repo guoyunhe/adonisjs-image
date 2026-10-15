@@ -91,13 +91,14 @@ their `quality` values are merged by format.
 | `convertTo`             | Raster output format for the original and default thumbnail format.               | Input format                                              |
 | `maxWidth`, `maxHeight` | Maximum dimensions for the processed original. Images are never enlarged.         | No resize limit                                           |
 | `fit`                   | Resize mode for the original: `cover`, `contain`, `fill`, `inside`, or `outside`. | `inside`                                                  |
-| `stripMetadata`         | Strip metadata and auto-rotate from EXIF orientation.                             | `true`                                                    |
+| `keepMetadata`          | Preserve metadata instead of auto-rotating and stripping EXIF.                    | `false`                                                   |
 | `quality`               | Compression quality from 1 to 100, keyed by format.                               | `jpeg: 80`, `webp: 80`, `avif: 50`, `png: 90`, `tiff: 80` |
 | `thumbnails`            | Map of thumbnail names to thumbnail settings.                                     | `{}`                                                      |
 
 SVG originals are sanitized (scripts, event handlers, styles, and external resources are removed)
-and kept as vector files unless `convertTo` is set. Their thumbnails are rasterized as PNG by
-default. `maxWidth`, `maxHeight`, and `fit` affect raster originals only when a resize limit is set.
+and kept as vector files unless `convertTo` is set. SVG metadata is retained only when
+`keepMetadata` is `true`. Their thumbnails are rasterized as PNG by default. `maxWidth`,
+`maxHeight`, and `fit` affect raster originals only when a resize limit is set.
 The generated starter config sets its own example limits and includes 1280, 640, and 320 square
 cover thumbnails for the default `image` preset; these examples do not alter the `defineConfig`
 defaults.

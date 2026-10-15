@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Rename the `stripMetadata` preset option to `keepMetadata`, defaulting to `false`; presets such as `photo` can opt in to preserving metadata.
+
 ## 0.1.0 - 2026-10-15
 
 ### Added

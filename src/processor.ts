@@ -47,7 +47,7 @@ export function extensionOf(format: ImageFormat) {
   return format === 'jpeg' ? 'jpg' : format;
 }
 
-function sanitizeSvg(input: Buffer, stripMetadata: boolean) {
+function sanitizeSvg(input: Buffer, keepMetadata: boolean) {
   const blockExternalResources: Parameters<typeof DOMPurify.addHook>[1] = (_node, data) => {
     const name = data.attrName.toLowerCase();
     const value = data.attrValue.trim();
@@ -63,8 +63,8 @@ function sanitizeSvg(input: Buffer, stripMetadata: boolean) {
   try {
     sanitized = DOMPurify.sanitize(input.toString('utf8'), {
       FORBID_ATTR: ['style'],
-      FORBID_CONTENTS: stripMetadata ? ['metadata'] : [],
-      FORBID_TAGS: stripMetadata ? [...FORBIDDEN_SVG_TAGS, 'metadata'] : FORBIDDEN_SVG_TAGS,
+      FORBID_CONTENTS: keepMetadata ? [] : ['metadata'],
+      FORBID_TAGS: keepMetadata ? FORBIDDEN_SVG_TAGS : [...FORBIDDEN_SVG_TAGS, 'metadata'],
       USE_PROFILES: { svg: true, svgFilters: true },
     });
   } finally {
@@ -109,7 +109,7 @@ export async function processOriginal(
     throw new InvalidImageException('Image format is not supported');
   }
 
-  const cleanInput = sourceFormat === 'svg' ? sanitizeSvg(input, config.stripMetadata) : input;
+  const cleanInput = sourceFormat === 'svg' ? sanitizeSvg(input, config.keepMetadata) : input;
   if (sourceFormat === 'svg' && !config.convertTo) {
     const metadata = await sharp(cleanInput).metadata();
     if (!metadata.width || !metadata.height) {
@@ -127,8 +127,8 @@ export async function processOriginal(
 
   const target = config.convertTo ?? rasterFormat(sourceFormat);
   let pipeline = sharp(cleanInput, { animated: target === 'gif' || target === 'webp' });
-  if (config.stripMetadata) pipeline = pipeline.rotate();
-  else pipeline = pipeline.keepMetadata();
+  if (config.keepMetadata) pipeline = pipeline.keepMetadata();
+  else pipeline = pipeline.rotate();
   if (config.maxWidth || config.maxHeight) {
     pipeline = pipeline.resize({
       width: config.maxWidth,
@@ -164,7 +164,7 @@ export async function processThumbnail(
     return undefined;
   }
 
-  const cleanInput = sourceFormat === 'svg' ? sanitizeSvg(input, config.stripMetadata) : input;
+  const cleanInput = sourceFormat === 'svg' ? sanitizeSvg(input, config.keepMetadata) : input;
   const format = thumb.format ?? rasterFormat(fallbackFormat);
   const pipeline = sharp(cleanInput)
     .rotate()

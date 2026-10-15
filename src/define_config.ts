@@ -2,7 +2,7 @@ import type { ImageConfig, ImageConfigInput, ResolvedImageConfig } from './types
 
 const defaultImagePreset: ResolvedImageConfig = {
   directory: 'images',
-  stripMetadata: true,
+  keepMetadata: false,
   quality: { jpeg: 80, webp: 80, avif: 50, png: 90, tiff: 80 },
   thumbnails: {},
 };

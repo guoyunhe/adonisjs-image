@@ -102,7 +102,7 @@ test('preserves a sanitized SVG original', async () => {
   const out = await processOriginal(input, resolveImagePreset(defineConfig()));
   const metadataPreserved = await processOriginal(
     input,
-    resolveImagePreset(defineConfig({ presets: { image: { stripMetadata: false } } })),
+    resolveImagePreset(defineConfig({ presets: { image: { keepMetadata: true } } })),
   );
   const output = out.buffer.toString();
 
