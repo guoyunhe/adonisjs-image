@@ -22,6 +22,7 @@ const imageConfig = defineConfig({
       },
     },
     avatar: {
+      // disk: 'fs',
       directory: 'avatars',
       maxWidth: 512,
       maxHeight: 512,
@@ -35,6 +36,7 @@ const imageConfig = defineConfig({
       },
     },
     photo: {
+      // disk: 's3',
       directory: 'photos',
       maxWidth: 6000,
       maxHeight: 6000,
