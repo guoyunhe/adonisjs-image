@@ -12,7 +12,7 @@ const imageConfig = defineConfig({
       directory: 'images',
       maxWidth: 2560,
       maxHeight: 2560,
-      convertTo: 'webp',
+      format: 'webp',
       quality: 80,
 
       thumbnails: {
@@ -26,7 +26,7 @@ const imageConfig = defineConfig({
       maxWidth: 512,
       maxHeight: 512,
       fit: 'cover',
-      convertTo: 'webp',
+      format: 'webp',
 
       thumbnails: {
         large: { width: 256, height: 256, fit: 'cover', format: 'webp' },
@@ -40,7 +40,8 @@ const imageConfig = defineConfig({
       maxHeight: 6000,
       /** Preserve EXIF metadata. May expose private information. Avoid for publicly accessible images. */
       keepMetadata: true,
-      quality: { jpeg: 95, webp: 90, avif: 80, png: 100, tiff: 95 },
+      format: { png: 'jpeg', tiff: 'jpeg' },
+      quality: 90,
 
       thumbnails: {
         large: { width: 1280, height: 1280, format: 'webp' },

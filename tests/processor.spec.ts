@@ -17,7 +17,7 @@ const svg = (content: string) =>
   );
 
 test('converts and resizes originals', async () => {
-  const config = defineConfig({ presets: { image: { convertTo: 'webp', maxWidth: 100 } } });
+  const config = defineConfig({ presets: { image: { format: 'webp', maxWidth: 100 } } });
   const out = await processOriginal(await png(), resolveImagePreset(config));
   assert.equal(out.format, 'webp');
   assert.equal(out.width, 100);
@@ -51,7 +51,7 @@ test('resolves image presets and crops avatars to a square', async () => {
         maxWidth: 128,
         maxHeight: 128,
         fit: 'cover',
-        convertTo: 'webp',
+        format: 'webp',
         quality: { webp: 95 },
       },
     },
@@ -67,6 +67,28 @@ test('resolves image presets and crops avatars to a square', async () => {
   assert.equal(avatar.format, 'webp');
   assert.deepEqual([avatar.width, avatar.height], [128, 128]);
   assert.throws(() => resolveImagePreset(config, 'missing'), /not configured/);
+});
+
+test('converts all input formats with a string and only mapped formats with an object', async () => {
+  const source = await png();
+  const tiff = await sharp({ create: { width: 40, height: 20, channels: 3, background: '#f00' } })
+    .tiff()
+    .toBuffer();
+  const jpeg = await sharp({ create: { width: 40, height: 20, channels: 3, background: '#f00' } })
+    .jpeg()
+    .toBuffer();
+  const inputSvg = svg('<circle cx="50" cy="40" r="30" fill="blue"/>');
+
+  const mapped = resolveImagePreset(
+    defineConfig({ presets: { image: { format: { png: 'webp', tiff: 'webp', svg: 'webp' } } } }),
+  );
+  assert.equal((await processOriginal(source, mapped)).format, 'webp');
+  assert.equal((await processOriginal(tiff, mapped)).format, 'webp');
+  assert.equal((await processOriginal(inputSvg, mapped)).format, 'webp');
+  assert.equal((await processOriginal(jpeg, mapped)).format, 'jpeg');
+
+  const allFormats = resolveImagePreset(defineConfig({ presets: { image: { format: 'webp' } } }));
+  assert.equal((await processOriginal(jpeg, allFormats)).format, 'webp');
 });
 
 test('supports one quality value for all formats and merges per-format overrides', async () => {
@@ -161,7 +183,7 @@ test('rasterizes SVG thumbnails and converts SVG originals when configured', asy
   const thumbnail = await processThumbnail(input, { width: 20, height: 20 }, config, 'svg');
   const converted = await processOriginal(
     input,
-    resolveImagePreset(defineConfig({ presets: { image: { convertTo: 'webp' } } })),
+    resolveImagePreset(defineConfig({ presets: { image: { format: 'webp' } } })),
   );
 
   assert.equal(thumbnail.format, 'png');

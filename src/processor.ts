@@ -117,7 +117,9 @@ export async function processOriginal(
   }
 
   const cleanInput = sourceFormat === 'svg' ? sanitizeSvg(input, config.keepMetadata) : input;
-  if (sourceFormat === 'svg' && !config.convertTo) {
+  const configuredFormat =
+    typeof config.format === 'string' ? config.format : config.format?.[sourceFormat];
+  if (sourceFormat === 'svg' && !configuredFormat) {
     const metadata = await sharp(cleanInput).metadata();
     if (!metadata.width || !metadata.height) {
       throw new InvalidImageException('SVG must have a defined width and height');
@@ -132,7 +134,7 @@ export async function processOriginal(
     };
   }
 
-  const target = config.convertTo ?? rasterFormat(sourceFormat);
+  const target = configuredFormat ?? rasterFormat(sourceFormat);
   let pipeline = sharp(cleanInput, { animated: target === 'gif' || target === 'webp' });
   if (config.keepMetadata) pipeline = pipeline.keepMetadata();
   else pipeline = pipeline.rotate();

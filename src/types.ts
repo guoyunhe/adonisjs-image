@@ -1,5 +1,6 @@
 export type RasterImageFormat = 'jpeg' | 'png' | 'webp' | 'avif' | 'gif' | 'tiff';
 export type ImageFormat = RasterImageFormat | 'svg';
+export type ImageOutputFormat = RasterImageFormat | Partial<Record<ImageFormat, RasterImageFormat>>;
 export type ImageQuality = number | Partial<Record<RasterImageFormat, number>>;
 
 export type FitMode = 'cover' | 'contain' | 'fill' | 'inside' | 'outside';
@@ -16,8 +17,8 @@ export interface ThumbnailConfig {
 }
 
 export interface ImageProcessingConfig {
-  /** Convert every upload to this format (e.g. 'webp') */
-  convertTo?: RasterImageFormat;
+  /** Convert every upload to one format, or map selected input formats to output formats */
+  format?: ImageOutputFormat;
   /** Resize originals to fit within these dimensions */
   maxWidth?: number;
   maxHeight?: number;

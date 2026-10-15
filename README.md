@@ -88,7 +88,7 @@ their per-format `quality` values are merged by format. A numeric `quality` appl
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- |
 | `disk`                  | Drive disk used to store files.                                                                                                      | Drive's configured default disk                           |
 | `directory`             | Key prefix inside the disk.                                                                                                          | `images`                                                  |
-| `convertTo`             | Raster output format for the original and default thumbnail format.                                                                  | Input format                                              |
+| `format`                | One raster output format for all uploads, or a map from selected input formats to output formats. Unmapped formats stay unchanged.   | Input format                                              |
 | `maxWidth`, `maxHeight` | Maximum dimensions for the processed original. Images are never enlarged.                                                            | No resize limit                                           |
 | `fit`                   | Resize mode for the original: `cover`, `contain`, `fill`, `inside`, or `outside`.                                                    | `inside`                                                  |
 | `keepMetadata`          | Preserve metadata instead of auto-rotating and stripping EXIF. May expose private information; avoid for publicly accessible images. | `false`                                                   |
@@ -96,12 +96,18 @@ their per-format `quality` values are merged by format. A numeric `quality` appl
 | `thumbnails`            | Map of thumbnail names to thumbnail settings.                                                                                        | `{}`                                                      |
 
 SVG originals are sanitized (scripts, event handlers, styles, and external resources are removed)
-and kept as vector files unless `convertTo` is set. SVG metadata is retained only when
+and kept as vector files unless `format` converts them. SVG metadata is retained only when
 `keepMetadata` is `true`. Their thumbnails are rasterized as PNG by default. `maxWidth`,
 `maxHeight`, and `fit` affect raster originals only when a resize limit is set.
 The generated starter config sets its own example limits and includes 1280, 640, and 320 square
 cover thumbnails for the default `image` preset; these examples do not alter the `defineConfig`
 defaults.
+
+Set `format` to a single value to convert every upload, or map only selected input formats:
+
+```ts
+format: { png: 'webp', tiff: 'webp', svg: 'webp' }
+```
 
 ### Thumbnail properties
 
@@ -266,7 +272,7 @@ presets: {
     maxWidth: 512,
     maxHeight: 512,
     fit: 'cover',
-    convertTo: 'webp',
+    format: 'webp',
     thumbnails: {
       large: { width: 256, height: 256, fit: 'cover', format: 'webp' },
       medium: { width: 128, height: 128, fit: 'cover', format: 'webp' },
