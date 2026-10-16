@@ -1,6 +1,6 @@
 {
   "name": "adonisjs-image",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Image uploads, processing, storage, and Lucid ORM integration for AdonisJS.",
   "keywords": [
     "adonisjs",
