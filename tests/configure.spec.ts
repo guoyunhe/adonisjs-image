@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 
@@ -10,6 +10,16 @@ import { stubsRoot } from '../index.js';
 
 test('resolves the source stubs directory', () => {
   assert.ok(existsSync(join(stubsRoot, 'config/image.stub')));
+});
+
+test('generates the image transformer with its descriptive filename', () => {
+  const transformerStub = readFileSync(join(stubsRoot, 'transformers/image.stub'), 'utf8');
+
+  assert.match(transformerStub, /app\/transformers\/image_transformer\.ts/);
+  assert.match(
+    transformerStub,
+    /ImageTransformer\.transform\(this\.whenLoaded\(this\.resource\.thumbnails\)\)/,
+  );
 });
 
 test('configures the package without checking Drive configuration', async () => {

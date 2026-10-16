@@ -1,17 +1,17 @@
 {{{
-  exports({ to: app.makePath('app/transformers/image.ts') })
+  exports({ to: app.makePath('app/transformers/image_transformer.ts') })
 }}}
 import { BaseTransformer } from '@adonisjs/core/transformers';
+import image from 'adonisjs-image/services/main';
 
 import type Image from '#models/image';
-import image from 'adonisjs-image/services/main';
 
 export default class ImageTransformer extends BaseTransformer<Image> {
   async toObject() {
     return {
       ...this.pick(this.resource, ['id', 'name', 'format', 'size', 'width', 'height']),
       url: await image.url(this.resource),
-      thumbnails: ImageTransformer.collection(this.whenLoaded(this.resource.thumbnails)),
+      thumbnails: ImageTransformer.transform(this.whenLoaded(this.resource.thumbnails)),
     };
   }
 }

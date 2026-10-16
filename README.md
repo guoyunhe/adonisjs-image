@@ -41,7 +41,7 @@ node ace migration:run
 `node ace add adonisjs-image` generates:
 
 - `app/models/image.ts`
-- `app/transformers/image.ts`
+- `app/transformers/image_transformer.ts`
 - `config/image.ts`
 - `database/migrations/<timestamp>_create_images_table.ts`
 
@@ -186,11 +186,11 @@ Invalid uploads throw `InvalidImageException`.
 
 ## Transformer
 
-The configure command generates `app/transformers/image.ts`. Use it to return public image URLs
+The configure command generates `app/transformers/image_transformer.ts`. Use it to return public image URLs
 without exposing storage details such as the Drive disk, storage path, or hash:
 
 ```ts
-import ImageTransformer from '#transformers/image';
+import ImageTransformer from '#transformers/image_transformer';
 
 return response.created(await ImageTransformer.transform(uploaded));
 ```
@@ -227,7 +227,7 @@ import type { HttpContext } from '@adonisjs/core/http';
 import image from 'adonisjs-image/services/main';
 
 import Image from '#models/image';
-import ImageTransformer from '#transformers/image';
+import ImageTransformer from '#transformers/image_transformer';
 import { uploadImageValidator } from '#validators/image';
 
 export default class ImagesController {
